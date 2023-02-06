@@ -1,0 +1,2 @@
+cd /d "C:\Users\STORE B\Documents\Visual Studio 2017\Projects\CG Inventory Management\CG Inventory Management" &msbuild "CG Inventory Management.vbproj" /t:sdvViewer /p:configuration="Debug" /p:platform="Any CPU" /p:SolutionDir="C:\Users\STORE B\Documents\Visual Studio 2017\Projects\CG Inventory Management" 
+exit %errorlevel% 
