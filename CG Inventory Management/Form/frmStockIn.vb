@@ -33,7 +33,8 @@
 
         If name <> "" Then
             SQL.AddParam("@name", "%" & name & "%")
-            SQL.ExecQuery("SELECT * FROM Rack WHERE RackName LIKE @name")
+            SQL.ExecQuery("SELECT * FROM Rack WHERE RackName LIKE @name OR RackName LIKE '%IC%' ORDER BY CASE WHEN RackName LIKE '%IC%' THEN 1 ELSE NULL END;")
+            'SQL.ExecQuery("SELECT * FROM Rack WHERE RackName LIKE @name")
         Else
             SQL.ExecQuery("SELECT * FROM Rack")
         End If
