@@ -96,7 +96,6 @@ Public Class frmIncoming
         End Using
     End Sub
 
-
     Private Sub txtQty_Enter(sender As Object, e As EventArgs) Handles txtQty.Enter
         txtQty.Select(0, txtQty.Text.Length)
     End Sub
@@ -366,8 +365,8 @@ Public Class frmIncoming
                             SQL.AddParam("@uid", txtEmployeeID.Text.Trim)
                             SQL.AddParam("@remark", txtRemark.Text.Trim)
 
-                            SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Rack, Type, Updater, Remark) " _
-                                          & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @rack, 1, @uid, @remark);")
+                            SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Rack, GRN, Type, Updater, Remark) " _
+                                          & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @rack, @grn, 1, @uid, @remark);")
 
                             If SQL.HasException(True) Then Exit Sub
 
@@ -439,8 +438,8 @@ Public Class frmIncoming
                     SQL.AddParam("@qty", txtQty.Value.ToString)
                     SQL.AddParam("@remark", txtRemark.Text.Trim)
 
-                    SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Type, Remark) " _
-                    & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, 0, @remark);")
+                    SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, GRN, Type, Remark) " _
+                    & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @grn, 0, @remark);")
 
                     If SQL.HasException(True) Then Exit Sub
                     PrintBar()

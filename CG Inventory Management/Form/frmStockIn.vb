@@ -254,8 +254,8 @@ onrecord:
         SQL.AddParam("@uid", txtEmployeeID.Text.Trim)
         SQL.AddParam("@remark", txtSRRemark.Text.Trim)
 
-        SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Rack, Type, Updater, Remark) " _
-                                          & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @rack, 2, @uid, @remark);")
+        SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Rack, GRN, Type, Updater, Remark) " _
+                                          & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @rack, @grn, 2, @uid, @remark);")
 
         If SQL.HasException(True) Then Exit Sub
 
@@ -424,8 +424,8 @@ onrecord:
         SQL.AddParam("@remark", txtSRRemark.Text.Trim)
         SQL.AddParam("@mtf", mtf)
 
-        SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Rack, MTFNumber, Type, Updater, Remark) " _
-                                          & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @rack, @mtf, 6, @uid, @remark);")
+        SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Rack, GRN, MTFNumber, Type, Updater, Remark) " _
+                                          & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @rack, @grn, @mtf, 6, @uid, @remark);")
 
         If SQL.HasException(True) Then Exit Sub
 

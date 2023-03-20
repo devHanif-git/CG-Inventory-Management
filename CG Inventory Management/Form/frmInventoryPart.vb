@@ -148,6 +148,8 @@
                             End If
 
                         Next
+                    Else
+                        dgvInventory.Rows.Clear()
                     End If
                 End If
 

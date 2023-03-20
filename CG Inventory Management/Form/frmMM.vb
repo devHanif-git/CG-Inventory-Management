@@ -197,6 +197,8 @@
                                                   SQL.DBDT.Rows(i - 1)("CGCode"), SQL.DBDT.Rows(i - 1)("PN_Desc"),
                                                   SQL.DBDT.Rows(i - 1)("QtyPerPart"), SQL.DBDT.Rows(i - 1)("UpdateTime"), SQL.DBDT.Rows(i - 1)("Updater")})
                         Next
+                    Else
+                        dgvMM.Rows.Clear()
                     End If
                 End If
 

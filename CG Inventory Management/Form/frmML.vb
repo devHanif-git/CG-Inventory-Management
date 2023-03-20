@@ -16,7 +16,7 @@
 
         dataGridViewRec.RowHeadersVisible = False
         dataGridViewRec.EnableHeadersVisualStyles = False
-        dataGridViewRec.ColumnCount = 11
+        dataGridViewRec.ColumnCount = 12
 
         dataGridViewRec.Columns(0).Name = "No."
         dataGridViewRec.Columns(1).Name = "Record Time"
@@ -25,10 +25,11 @@
         dataGridViewRec.Columns(4).Name = "Quantity"
         dataGridViewRec.Columns(5).Name = "Quantity Out"
         dataGridViewRec.Columns(6).Name = "Location"
-        dataGridViewRec.Columns(7).Name = "MTF Number"
-        dataGridViewRec.Columns(8).Name = "Type"
-        dataGridViewRec.Columns(9).Name = "Updater"
-        dataGridViewRec.Columns(10).Name = "Remark"
+        dataGridViewRec.Columns(7).Name = "GRN Number"
+        dataGridViewRec.Columns(8).Name = "MTF Number"
+        dataGridViewRec.Columns(9).Name = "Type"
+        dataGridViewRec.Columns(10).Name = "Updater"
+        dataGridViewRec.Columns(11).Name = "Remark"
 
         dataGridViewRec.RowTemplate.Height = 35
         dataGridViewRec.AllowUserToResizeRows = False
@@ -38,14 +39,15 @@
 
         dataGridViewRec.Columns("No.").Width = 40
         dataGridViewRec.Columns("CGID").Width = 150
-        dataGridViewRec.Columns("Part Number").Width = 180
+        dataGridViewRec.Columns("Part Number").Width = 150
         dataGridViewRec.Columns("Location").Width = 78
         dataGridViewRec.Columns("Quantity").Width = 75
-        dataGridViewRec.Columns("Record Time").Width = 105
+        dataGridViewRec.Columns("Record Time").Width = 100
         dataGridViewRec.Columns("Updater").Width = 90
         dataGridViewRec.Columns("Quantity Out").Width = 75
-        dataGridViewRec.Columns("Type").Width = 200
-        dataGridViewRec.Columns("MTF Number").Width = 120
+        dataGridViewRec.Columns("Type").Width = 150
+        dataGridViewRec.Columns("MTF Number").Width = 110
+        dataGridViewRec.Columns("GRN Number").Width = 110
 
         'dataGridViewRec.Columns("Date Code").DefaultCellStyle.Format = "dd-MM-yyyy"
 
@@ -106,17 +108,13 @@
                 End If
 
                 Dim textmtf As String
+                Dim textgrn As String
 
-                If SQL.DBDT.Rows(i - 1)("MTFNumber").ToString = "" Then
-                    textmtf = "-"
-                Else
-                    textmtf = SQL.DBDT.Rows(i - 1)("MTFNumber")
-                    'ElseIf SQL.DBDT.Rows(i - 1)("State") = 1 Then
-                    '    textstate = "-"
-                End If
+                textmtf = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("MTFNumber").ToString()), "-", SQL.DBDT.Rows(i - 1)("MTFNumber"))
+                textgrn = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("GRN").ToString()), "-", SQL.DBDT.Rows(i - 1)("GRN"))
 
                 dgvLog.Rows.Add(New Object() {i.ToString + ".", SQL.DBDT.Rows(i - 1)("RecordTime"), SQL.DBDT.Rows(i - 1)("PartNumber"), SQL.DBDT.Rows(i - 1)("CGID"),
-                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textmtf, texttype, ' SQL.DBDT.Rows(i - 1)("MTFNumber")
+                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textgrn, textmtf, texttype,
                                 SQL.DBDT.Rows(i - 1)("Updater"), SQL.DBDT.Rows(i - 1)("Remark")})
 
 
@@ -223,22 +221,19 @@
                     textout = "-"
                 Else
                     textout = SQL.DBDT.Rows(i - 1)("QtyOut")
-                    'ElseIf SQL.DBDT.Rows(i - 1)("State") = 1 Then
-                    '    textstate = "-"
+                    If textout.StartsWith("-") Then
+                        textout = "+" & textout.Substring(1)
+                    End If
                 End If
 
                 Dim textmtf As String
+                Dim textgrn As String
 
-                If SQL.DBDT.Rows(i - 1)("MTFNumber").ToString = "" Then
-                    textmtf = "-"
-                Else
-                    textmtf = SQL.DBDT.Rows(i - 1)("MTFNumber")
-                    'ElseIf SQL.DBDT.Rows(i - 1)("State") = 1 Then
-                    '    textstate = "-"
-                End If
+                textmtf = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("MTFNumber").ToString), "-", SQL.DBDT.Rows(i - 1)("MTFNumber"))
+                textgrn = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("GRN").ToString), "-", SQL.DBDT.Rows(i - 1)("GRN"))
 
                 dgvLog.Rows.Add(New Object() {i.ToString + ".", SQL.DBDT.Rows(i - 1)("RecordTime"), SQL.DBDT.Rows(i - 1)("PartNumber"), SQL.DBDT.Rows(i - 1)("CGID"),
-                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textmtf, texttype, ' SQL.DBDT.Rows(i - 1)("MTFNumber")
+                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textgrn, textmtf, texttype,
                                 SQL.DBDT.Rows(i - 1)("Updater"), SQL.DBDT.Rows(i - 1)("Remark")})
             Next
 
@@ -318,24 +313,22 @@
                                 textout = "-"
                             Else
                                 textout = SQL.DBDT.Rows(i - 1)("QtyOut")
-                                'ElseIf SQL.DBDT.Rows(i - 1)("State") = 1 Then
-                                '    textstate = "-"
+                                If textout.StartsWith("-") Then
+                                    textout = "+" & textout.Substring(1)
+                                End If
                             End If
 
                             Dim textmtf As String
+                            Dim textgrn As String
 
-                            If SQL.DBDT.Rows(i - 1)("MTFNumber").ToString = "" Then
-                                textmtf = "-"
-                            Else
-                                textmtf = SQL.DBDT.Rows(i - 1)("MTFNumber")
-                                'ElseIf SQL.DBDT.Rows(i - 1)("State") = 1 Then
-                                '    textstate = "-"
-                            End If
+                            textmtf = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("MTFNumber").ToString), "-", SQL.DBDT.Rows(i - 1)("MTFNumber"))
+                            textgrn = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("GRN").ToString), "-", SQL.DBDT.Rows(i - 1)("GRN"))
 
                             dgvLog.Rows.Add(New Object() {i.ToString + ".", SQL.DBDT.Rows(i - 1)("RecordTime"), SQL.DBDT.Rows(i - 1)("PartNumber"), SQL.DBDT.Rows(i - 1)("CGID"),
-                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textmtf, texttype, ' SQL.DBDT.Rows(i - 1)("MTFNumber")
+                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textgrn, textmtf, texttype,
                                 SQL.DBDT.Rows(i - 1)("Updater"), SQL.DBDT.Rows(i - 1)("Remark")})
                         Next
+
                     End If
                 End If
 
@@ -400,24 +393,23 @@
                             textout = "-"
                         Else
                             textout = SQL.DBDT.Rows(i - 1)("QtyOut")
-                            'ElseIf SQL.DBDT.Rows(i - 1)("State") = 1 Then
-                            '    textstate = "-"
+                            If textout.StartsWith("-") Then
+                                textout = "+" & textout.Substring(1)
+                            End If
                         End If
 
                         Dim textmtf As String
+                        Dim textgrn As String
 
-                        If SQL.DBDT.Rows(i - 1)("MTFNumber").ToString = "" Then
-                            textmtf = "-"
-                        Else
-                            textmtf = SQL.DBDT.Rows(i - 1)("MTFNumber")
-                            'ElseIf SQL.DBDT.Rows(i - 1)("State") = 1 Then
-                            '    textstate = "-"
-                        End If
+                        textmtf = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("MTFNumber").ToString), "-", SQL.DBDT.Rows(i - 1)("MTFNumber"))
+                        textgrn = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("GRN").ToString), "-", SQL.DBDT.Rows(i - 1)("GRN"))
 
                         dgvLog.Rows.Add(New Object() {i.ToString + ".", SQL.DBDT.Rows(i - 1)("RecordTime"), SQL.DBDT.Rows(i - 1)("PartNumber"), SQL.DBDT.Rows(i - 1)("CGID"),
-                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textmtf, texttype, ' SQL.DBDT.Rows(i - 1)("MTFNumber")
+                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textgrn, textmtf, texttype,
                                 SQL.DBDT.Rows(i - 1)("Updater"), SQL.DBDT.Rows(i - 1)("Remark")})
                     Next
+                Else
+                    dgvLog.Rows.Clear()
                 End If
 
             Catch ex As Exception

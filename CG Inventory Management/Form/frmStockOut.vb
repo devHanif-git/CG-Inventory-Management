@@ -216,8 +216,8 @@
         SQL.AddParam("@uid", txtEmployeeID.Text.Trim)
         SQL.AddParam("@remark", txtStockOutRemark.Text.Trim)
 
-        SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Rack, MTFNumber, Type, Updater, Remark) " _
-                                          & "VALUES(GETDATE(), @pn, @cgid, @qty, @qty, @rack, @mtf, @type, @uid, @remark);")
+        SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Rack, GRN, MTFNumber, Type, Updater, Remark) " _
+                                          & "VALUES(GETDATE(), @pn, @cgid, @qty, @qty, @rack, @grn, @mtf, @type, @uid, @remark);")
 
         If SQL.HasException(True) Then Exit Sub
 

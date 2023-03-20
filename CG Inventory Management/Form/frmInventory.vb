@@ -233,6 +233,8 @@
                                       SQL.DBDT.Rows(i - 1)("CGCode"), SQL.DBDT.Rows(i - 1)("PN_Desc"),
                                       SQL.DBDT.Rows(i - 1)("NoC"), SQL.DBDT.Rows(i - 1)("Total Quantity")})
                         Next
+                    Else
+                        dgvInventory.Rows.Clear()
                     End If
                 End If
 
