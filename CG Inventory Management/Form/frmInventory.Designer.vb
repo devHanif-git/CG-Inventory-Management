@@ -151,10 +151,12 @@ Partial Class frmInventory
         '
         Me.dgvInventory.AllowUserToAddRows = False
         Me.dgvInventory.AllowUserToDeleteRows = False
+        Me.dgvInventory.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgvInventory.BackgroundColor = System.Drawing.Color.White
         Me.dgvInventory.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvInventory.ContextMenuStrip = Me.Guna2ContextMenuStrip1
-        Me.dgvInventory.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvInventory.Location = New System.Drawing.Point(0, 0)
         Me.dgvInventory.Name = "dgvInventory"
         Me.dgvInventory.ReadOnly = True
@@ -181,7 +183,7 @@ Partial Class frmInventory
         '
         Me.DeletePartNumberToolStripMenuItem.Image = Global.CG_Inventory_Management.My.Resources.Resources.printer__1_
         Me.DeletePartNumberToolStripMenuItem.Name = "DeletePartNumberToolStripMenuItem"
-        Me.DeletePartNumberToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.DeletePartNumberToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
         Me.DeletePartNumberToolStripMenuItem.Text = "Print Label Carton"
         '
         'frmInventory
