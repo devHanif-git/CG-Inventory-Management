@@ -115,7 +115,6 @@
     End Sub
 
     Private Sub dgvInventory_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvInventory.CellClick
-        Label2.Text = dgvInventory.CurrentCell.Value
         frmInventoryPart.Text = "Inventory for Part Number: " + dgvInventory.CurrentRow.Cells(0).Value.ToString
     End Sub
 

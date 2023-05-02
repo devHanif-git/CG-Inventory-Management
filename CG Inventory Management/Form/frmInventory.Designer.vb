@@ -24,7 +24,6 @@ Partial Class frmInventory
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmInventory))
         Me.Panel1 = New System.Windows.Forms.Panel()
-        Me.Label2 = New System.Windows.Forms.Label()
         Me.Panel3 = New System.Windows.Forms.Panel()
         Me.btnExport = New Guna.UI2.WinForms.Guna2Button()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -43,7 +42,6 @@ Partial Class frmInventory
         'Panel1
         '
         Me.Panel1.BackColor = System.Drawing.Color.White
-        Me.Panel1.Controls.Add(Me.Label2)
         Me.Panel1.Controls.Add(Me.Panel3)
         Me.Panel1.Controls.Add(Me.btnExport)
         Me.Panel1.Controls.Add(Me.Label1)
@@ -56,15 +54,6 @@ Partial Class frmInventory
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(1278, 94)
         Me.Panel1.TabIndex = 1
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(293, 20)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(57, 20)
-        Me.Label2.TabIndex = 93
-        Me.Label2.Text = "Label2"
         '
         'Panel3
         '
@@ -228,5 +217,4 @@ Partial Class frmInventory
     Friend WithEvents btnExport As Guna.UI2.WinForms.Guna2Button
     Friend WithEvents Guna2ContextMenuStrip1 As Guna.UI2.WinForms.Guna2ContextMenuStrip
     Friend WithEvents DeletePartNumberToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents Label2 As Label
 End Class
