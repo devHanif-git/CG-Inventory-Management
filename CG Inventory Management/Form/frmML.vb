@@ -1,70 +1,164 @@
 ﻿Public Class frmML
     Public SQL As New SQLControl
+
+    Private currentPage As Integer = 1
+    Private pageSize As Integer = 100
+    Private totalRecords As Integer = 0
+    Private totalPages As Integer = 0
+    Private pageType As Integer = 0
+    Private searchMode As Boolean
+    Private searchType As String = ""
+    Private searchText As String = ""
+
     Private Sub frmML_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Show()
+        Loading.Show()
         dgvLog.DoubleBuffered(True)
         SetupDGV()
 
+        LoadData(999)
+
         cbxSearch.SelectedIndex = 0
         cbxType.SelectedIndex = 0
+        Loading.Close()
+        Me.Show()
         txtSearch.Focus()
+
+    End Sub
+
+    Private Sub LoadData(type As Integer)
+        Dim query As String = "SELECT COUNT(*) FROM PartLog"
+
+        If type <> 999 And searchMode = False Then
+            SQL.AddParam("@type", type)
+            query &= " WHERE Type = @type"
+
+        ElseIf type <> 999 And searchMode Then
+            SQL.AddParam("@searchText", "%" & searchText & "%")
+            SQL.AddParam("@type", type)
+            query &= " WHERE Type = @type AND " & searchType & " LIKE @searchText"
+
+        ElseIf type = 999 And searchMode Then
+            SQL.AddParam("@searchText", "%" & searchText & "%")
+            query &= " WHERE " & searchType & " LIKE @searchText"
+
+        End If
+
+        SQL.ExecQuery(query)
+
+        If SQL.HasException(True) Then Exit Sub
+
+        totalRecords = SQL.DBDT.Rows(0)(0)
+
+        ' Calculate the number of pages needed
+        totalPages = Math.Ceiling(totalRecords / pageSize)
+
+        lblTotalHis.Text = If(totalPages < 1, "0 records overall, 0 pages, and 100 records per page.",
+            String.Format("{0} records overall, {1} pages, and 100 records per page.", totalRecords, totalPages))
+
+        ' Update the navigation buttons
+        UpdateNavButtons()
+
+        ' Load first page of data
+        LoadDatatoDGV()
+    End Sub
+
+    Private Sub CalculateFunction(mode As Integer)
+        If dgvLog.SelectedRows.Count > 0 And mode = 0 Then 'for out
+            Dim total As Integer = 0
+            For Each row As DataGridViewRow In dgvLog.SelectedRows
+                If row.Cells("Quantity Out").Value.ToString().StartsWith("+") Or row.Cells("Quantity Out").Value.ToString() = "-" Then
+                    total += 0
+                Else
+                    total += CInt(row.Cells("Quantity Out").Value)
+                End If
+            Next
+            MessageBox.Show("Total Quantity Out: " & total)
+        ElseIf dgvLog.SelectedRows.Count > 0 And mode = 1 Then  'for in
+            Dim total As Integer = 0
+            For Each row As DataGridViewRow In dgvLog.SelectedRows
+                If Not row.Cells("Type").Value.ToString().StartsWith("Part Stock In") Then
+                    MessageBox.Show("Please select the correct row/type before pressing the calculate button.")
+                    Exit Sub
+                End If
+
+                If row.Cells("Type").Value.ToString().StartsWith("Part Stock In") Then
+                    total += CInt(row.Cells("Quantity").Value)
+                Else
+                    total += 0
+                End If
+            Next
+            MessageBox.Show("Total Quantity In: " & total)
+        Else
+            MessageBox.Show("Please select at least one row before pressing the calculate button.")
+        End If
+    End Sub
+
+    Private Sub UpdateNavButtons()
+        btnFirst.Enabled = (currentPage > 1)
+        btnPrev.Enabled = (currentPage > 1)
+        btnNext.Enabled = (currentPage < totalPages)
+        btnLast.Enabled = (currentPage < totalPages)
+
+        ' Update the page label
+        lblPage.Text = If(totalPages < 1, "Page 0 of 0", String.Format("Page {0} of {1}", currentPage, totalPages))
     End Sub
 
     Private Sub SetupDGV()
+        With dgvLog
+            .RowHeadersVisible = False
+            .EnableHeadersVisualStyles = False
+            .ColumnCount = 12
+            .RowTemplate.Height = 35
+            .AllowUserToResizeRows = False
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            .DefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(218, 238, 255)
+            .ColumnHeadersDefaultCellStyle.Font = New Font(.Font, FontStyle.Bold)
 
-        Dim dataGridViewRec As DataGridView = dgvLog
+            Dim columns As String() = {"No.", "Record Time", "Part Number", "CGID", "Quantity", "Quantity Out",
+                                       "Location", "GRN Number", "MTF Number", "Type", "Updater", "Remark"}
+            Dim widths As Integer() = {40, 100, 150, 150, 75, 75, 78, 120, 110, 180, 90}
+            For i As Integer = 0 To columns.Length - 1
+                .Columns(i).Name = columns(i)
+            Next
 
-        dataGridViewRec.RowHeadersVisible = False
-        dataGridViewRec.EnableHeadersVisualStyles = False
-        dataGridViewRec.ColumnCount = 12
+            For i As Integer = 0 To widths.Length - 1
+                .Columns(i).Width = widths(i)
+            Next
 
-        dataGridViewRec.Columns(0).Name = "No."
-        dataGridViewRec.Columns(1).Name = "Record Time"
-        dataGridViewRec.Columns(2).Name = "Part Number"
-        dataGridViewRec.Columns(3).Name = "CGID"
-        dataGridViewRec.Columns(4).Name = "Quantity"
-        dataGridViewRec.Columns(5).Name = "Quantity Out"
-        dataGridViewRec.Columns(6).Name = "Location"
-        dataGridViewRec.Columns(7).Name = "GRN Number"
-        dataGridViewRec.Columns(8).Name = "MTF Number"
-        dataGridViewRec.Columns(9).Name = "Type"
-        dataGridViewRec.Columns(10).Name = "Updater"
-        dataGridViewRec.Columns(11).Name = "Remark"
-
-        dataGridViewRec.RowTemplate.Height = 35
-        dataGridViewRec.AllowUserToResizeRows = False
-
-        dataGridViewRec.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-        dataGridViewRec.AutoResizeColumns()
-
-        dataGridViewRec.Columns("No.").Width = 40
-        dataGridViewRec.Columns("CGID").Width = 150
-        dataGridViewRec.Columns("Part Number").Width = 150
-        dataGridViewRec.Columns("Location").Width = 78
-        dataGridViewRec.Columns("Quantity").Width = 75
-        dataGridViewRec.Columns("Record Time").Width = 100
-        dataGridViewRec.Columns("Updater").Width = 90
-        dataGridViewRec.Columns("Quantity Out").Width = 75
-        dataGridViewRec.Columns("Type").Width = 150
-        dataGridViewRec.Columns("MTF Number").Width = 110
-        dataGridViewRec.Columns("GRN Number").Width = 110
-
-        'dataGridViewRec.Columns("Date Code").DefaultCellStyle.Format = "dd-MM-yyyy"
-
-        dataGridViewRec.RowsDefaultCellStyle.BackColor = Color.White
-        dataGridViewRec.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(218, 238, 255)
-
-        With dataGridViewRec.ColumnHeadersDefaultCellStyle
-            '.BackColor = Color.Navy
-            '.ForeColor = Color.White
-            .Font = New Font(dataGridViewRec.Font, FontStyle.Bold)
+            ' dataGridViewRec.Columns("Date Code").DefaultCellStyle.Format = "dd-MM-yyyy"
         End With
     End Sub
 
     Private Sub LoadDatatoDGV()
         dgvLog.Rows.Clear()
 
-        SQL.ExecQuery("SELECT * FROM PartLog ORDER BY RecordTime DESC")
+        ' Retrieve the records for the current page
+        Dim offset As Integer = (currentPage - 1) * pageSize
+        SQL.AddParam("@offset", offset)
+        SQL.AddParam("@fetch", pageSize)
+
+        If pageType <> 0 And searchMode = False Then
+            'Query for != "Show All" but without search.
+            SQL.AddParam("@type", pageType - 1)
+            SQL.ExecQuery("SELECT * FROM PartLog WHERE Type = @type ORDER BY RecordTime DESC OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY")
+
+        ElseIf pageType <> 0 And searchMode Then
+            'Query for Selection Mode != "Show All" but Make search.
+            SQL.AddParam("@searchText", "%" & searchText & "%")
+            SQL.AddParam("@type", pageType - 1)
+            SQL.ExecQuery("SELECT * FROM PartLog WHERE Type = @type AND " & searchType & " LIKE @searchText ORDER BY RecordTime DESC OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY")
+
+        ElseIf pageType = 0 And searchMode = False Then
+            'Query for "Show All" but without search.
+            SQL.ExecQuery("SELECT * FROM PartLog ORDER BY RecordTime DESC OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY")
+
+        ElseIf pageType = 0 And searchMode Then
+            'Query for "Show All" but Make Search.
+            SQL.AddParam("@searchText", "%" & searchText & "%")
+            SQL.ExecQuery("SELECT * FROM PartLog WHERE " & searchType & " LIKE @searchText ORDER BY RecordTime DESC OFFSET @offset ROWS FETCH NEXT @fetch ROWS ONLY")
+
+        End If
 
         If SQL.HasException(True) Then Exit Sub
 
@@ -72,39 +166,17 @@
             For i As Integer = 1 To SQL.DBDT.Rows.Count
                 Dim texttype As String
 
-                If SQL.DBDT.Rows(i - 1)("Type") = 0 Then
-                    texttype = "Incoming Print Label"
+                Dim typeTexts() As String = {"Incoming Print Label", "Part Stock In After Printing",
+                    "Part Stock In", "Part Issued (Material Requisition)", "Part Over Request",
+                    "Part Issued (Others)", "Return And Stock In Complete"}
 
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 1 Then
-                    texttype = "Part Stock In After Printing"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 2 Then
-                    texttype = "Part Stock In"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 3 Then
-                    texttype = "Part Issued (Material Requisition)"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 4 Then
-                    texttype = "Part Over Request"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 5 Then
-                    texttype = "Part Issued (Others)"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 6 Then
-                    texttype = "Return And Stock In Complete"
-                Else
-                    texttype = ""
-                End If
+                texttype = typeTexts(SQL.DBDT.Rows(i - 1)("Type"))
 
                 Dim textout As String
 
-                If SQL.DBDT.Rows(i - 1)("QtyOut") = 0 Then
-                    textout = "-"
-                Else
-                    textout = SQL.DBDT.Rows(i - 1)("QtyOut")
-                    If textout.StartsWith("-") Then
-                        textout = "+" & textout.Substring(1)
-                    End If
+                textout = If(SQL.DBDT.Rows(i - 1)("QtyOut") = 0, "-", SQL.DBDT.Rows(i - 1)("QtyOut"))
+                If SQL.DBDT.Rows(i - 1)("QtyOut").ToString.StartsWith("-") Then
+                    textout = "+" & textout.Substring(1)
                 End If
 
                 Dim textmtf As String
@@ -137,7 +209,6 @@
     Private Sub txtSearch_TextChanged(sender As Object, e As EventArgs) Handles txtSearch.TextChanged
         If txtSearch.Text.Trim = "" Then
             dgvLog.ClearSelection()
-            'dgvInventory.CurrentCell = Nothing
             Return
         End If
 
@@ -158,88 +229,13 @@
     End Sub
 
     Private Sub cbxType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbxType.SelectedIndexChanged
-        Dim typetext As String = ""
+        Dim typetext As String
+        currentPage = 1
 
-        If cbxType.SelectedIndex = 0 Then
-            LoadDatatoDGV()
-            Exit Sub
-        ElseIf cbxType.SelectedIndex = 1 Then
-            typetext = 0
-        ElseIf cbxType.SelectedIndex = 2 Then
-            typetext = 1
-        ElseIf cbxType.SelectedIndex = 3 Then
-            typetext = 2
-        ElseIf cbxType.SelectedIndex = 4 Then
-            typetext = 3
-        ElseIf cbxType.SelectedIndex = 5 Then
-            typetext = 4
-        ElseIf cbxType.SelectedIndex = 6 Then
-            typetext = 5
-        ElseIf cbxType.SelectedIndex = 7 Then
-            typetext = 6
-        End If
+        pageType = cbxType.SelectedIndex
+        typetext = If(pageType = 0, 999, pageType - 1)
 
-        SQL.AddParam("@type", typetext)
-
-        SQL.ExecQuery("SELECT * FROM PartLog WHERE Type = @type ORDER BY RecordTime DESC")
-
-        If SQL.HasException(True) Then Exit Sub
-
-        If SQL.RecordCount > 0 Then
-            dgvLog.Rows.Clear()
-
-            For i As Integer = 1 To SQL.DBDT.Rows.Count
-                Dim texttype As String
-
-                If SQL.DBDT.Rows(i - 1)("Type") = 0 Then
-                    texttype = "Incoming Print Label"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 1 Then
-                    texttype = "Part Stock In After Printing"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 2 Then
-                    texttype = "Part Stock In"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 3 Then
-                    texttype = "Part Issued (Material Requisition)"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 4 Then
-                    texttype = "Part Over Request"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 5 Then
-                    texttype = "Part Issued (Others)"
-
-                ElseIf SQL.DBDT.Rows(i - 1)("Type") = 6 Then
-                    texttype = "Return And Stock In Complete"
-                Else
-                    texttype = ""
-                End If
-
-                Dim textout As String
-
-                If SQL.DBDT.Rows(i - 1)("QtyOut") = 0 Then
-                    textout = "-"
-                Else
-                    textout = SQL.DBDT.Rows(i - 1)("QtyOut")
-                    If textout.StartsWith("-") Then
-                        textout = "+" & textout.Substring(1)
-                    End If
-                End If
-
-                Dim textmtf As String
-                Dim textgrn As String
-
-                textmtf = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("MTFNumber").ToString), "-", SQL.DBDT.Rows(i - 1)("MTFNumber"))
-                textgrn = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("GRN").ToString), "-", SQL.DBDT.Rows(i - 1)("GRN"))
-
-                dgvLog.Rows.Add(New Object() {i.ToString + ".", SQL.DBDT.Rows(i - 1)("RecordTime"), SQL.DBDT.Rows(i - 1)("PartNumber"), SQL.DBDT.Rows(i - 1)("CGID"),
-                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textgrn, textmtf, texttype,
-                                SQL.DBDT.Rows(i - 1)("Updater"), SQL.DBDT.Rows(i - 1)("Remark")})
-            Next
-
-        Else
-            dgvLog.Rows.Clear()
-        End If
+        LoadData(typetext)
     End Sub
 
     Private Sub txtSearch_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtSearch.KeyPress
@@ -248,174 +244,24 @@
             'no beep
             e.Handled = True
             Try
-                Dim typetext As String = ""
-                If cbxType.SelectedIndex = 0 Then
-                    typetext = 9
-                ElseIf cbxType.SelectedIndex = 1 Then
-                    typetext = 0
-                ElseIf cbxType.SelectedIndex = 2 Then
-                    typetext = 1
-                ElseIf cbxType.SelectedIndex = 3 Then
-                    typetext = 2
-                ElseIf cbxType.SelectedIndex = 4 Then
-                    typetext = 3
-                ElseIf cbxType.SelectedIndex = 5 Then
-                    typetext = 4
-                ElseIf cbxType.SelectedIndex = 6 Then
-                    typetext = 5
-                ElseIf cbxType.SelectedIndex = 7 Then
-                    typetext = 6
-                End If
 
                 If txtSearch.Text = "" Then
-                    If typetext = 9 Then
-                        SQL.ExecQuery("SELECT * FROM PartLog ORDER BY RecordTime DESC")
-                    Else
-                        SQL.AddParam("@type", typetext)
-                        SQL.ExecQuery("SELECT * FROM PartLog WHERE Type = @type ORDER BY RecordTime DESC")
-                    End If
-
-                    If SQL.HasException(True) Then Exit Sub
-
-                    If SQL.RecordCount > 0 Then
-                        dgvLog.Rows.Clear()
-
-                        For i As Integer = 1 To SQL.DBDT.Rows.Count
-                            Dim texttype As String
-
-                            If SQL.DBDT.Rows(i - 1)("Type") = 0 Then
-                                texttype = "Incoming Print Label"
-
-                            ElseIf SQL.DBDT.Rows(i - 1)("Type") = 1 Then
-                                texttype = "Part Stock In After Printing"
-
-                            ElseIf SQL.DBDT.Rows(i - 1)("Type") = 2 Then
-                                texttype = "Part Stock In"
-
-                            ElseIf SQL.DBDT.Rows(i - 1)("Type") = 3 Then
-                                texttype = "Part Issued (Material Requisition)"
-
-                            ElseIf SQL.DBDT.Rows(i - 1)("Type") = 4 Then
-                                texttype = "Part Over Request"
-
-                            ElseIf SQL.DBDT.Rows(i - 1)("Type") = 5 Then
-                                texttype = "Part Issued (Others)"
-
-                            ElseIf SQL.DBDT.Rows(i - 1)("Type") = 6 Then
-                                texttype = "Return And Stock In Complete"
-                            Else
-                                texttype = ""
-                            End If
-
-                            Dim textout As String
-
-                            If SQL.DBDT.Rows(i - 1)("QtyOut") = 0 Then
-                                textout = "-"
-                            Else
-                                textout = SQL.DBDT.Rows(i - 1)("QtyOut")
-                                If textout.StartsWith("-") Then
-                                    textout = "+" & textout.Substring(1)
-                                End If
-                            End If
-
-                            Dim textmtf As String
-                            Dim textgrn As String
-
-                            textmtf = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("MTFNumber").ToString), "-", SQL.DBDT.Rows(i - 1)("MTFNumber"))
-                            textgrn = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("GRN").ToString), "-", SQL.DBDT.Rows(i - 1)("GRN"))
-
-                            dgvLog.Rows.Add(New Object() {i.ToString + ".", SQL.DBDT.Rows(i - 1)("RecordTime"), SQL.DBDT.Rows(i - 1)("PartNumber"), SQL.DBDT.Rows(i - 1)("CGID"),
-                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textgrn, textmtf, texttype,
-                                SQL.DBDT.Rows(i - 1)("Updater"), SQL.DBDT.Rows(i - 1)("Remark")})
-                        Next
-
-                    End If
-                End If
-
-                Dim filtertext As String = ""
-                If cbxSearch.SelectedIndex = 0 Then
-                    filtertext = "PartNumber"
-                ElseIf cbxSearch.SelectedIndex = 1 Then
-                    filtertext = "CGID"
-                ElseIf cbxSearch.SelectedIndex = 2 Then
-                    filtertext = "Rack"
-                ElseIf cbxSearch.SelectedIndex = 3 Then
-                    filtertext = "MTFNumber"
-                ElseIf cbxSearch.SelectedIndex = 4 Then
-                    filtertext = "Remark"
-                End If
-
-                If typetext = 9 Then
-                    SQL.AddParam("@filter", "%" & txtSearch.Text.Trim.ToUpper & "%")
-                    SQL.ExecQuery("SELECT * FROM PartLog WHERE " & filtertext & " LIKE @filter ORDER BY RecordTime DESC")
+                    searchMode = False
                 Else
-                    SQL.AddParam("@type", typetext)
-                    SQL.AddParam("@filter", "%" & txtSearch.Text.Trim.ToUpper & "%")
+                    currentPage = 1
+                    searchMode = True
 
-                    SQL.ExecQuery("SELECT * FROM PartLog WHERE Type = @type AND " & filtertext & " LIKE @filter ORDER BY RecordTime DESC")
+                    Dim dataTypes As String() = {"PartNumber", "CGID", "Rack", "GRN", "MTFNumber", "Remark"}
+
+                    searchType = dataTypes(cbxSearch.SelectedIndex)
+
+                    searchText = txtSearch.Text.Trim.ToUpper
                 End If
 
-                If SQL.HasException(True) Then Exit Sub
-
-                If SQL.RecordCount > 0 Then
-                    dgvLog.Rows.Clear()
-
-                    For i As Integer = 1 To SQL.DBDT.Rows.Count
-                        Dim texttype As String
-
-                        If SQL.DBDT.Rows(i - 1)("Type") = 0 Then
-                            texttype = "Incoming Print Label"
-
-                        ElseIf SQL.DBDT.Rows(i - 1)("Type") = 1 Then
-                            texttype = "Part Stock In After Printing"
-
-                        ElseIf SQL.DBDT.Rows(i - 1)("Type") = 2 Then
-                            texttype = "Part Stock In"
-
-                        ElseIf SQL.DBDT.Rows(i - 1)("Type") = 3 Then
-                            texttype = "Part Issued (Material Requisition)"
-
-                        ElseIf SQL.DBDT.Rows(i - 1)("Type") = 4 Then
-                            texttype = "Part Over Request"
-
-                        ElseIf SQL.DBDT.Rows(i - 1)("Type") = 5 Then
-                            texttype = "Part Issued (Others)"
-
-                        ElseIf SQL.DBDT.Rows(i - 1)("Type") = 6 Then
-                            texttype = "Return And Stock In Complete"
-                        Else
-                            texttype = ""
-                        End If
-
-                        Dim textout As String
-
-                        If SQL.DBDT.Rows(i - 1)("QtyOut") = 0 Then
-                            textout = "-"
-                        Else
-                            textout = SQL.DBDT.Rows(i - 1)("QtyOut")
-                            If textout.StartsWith("-") Then
-                                textout = "+" & textout.Substring(1)
-                            End If
-                        End If
-
-                        Dim textmtf As String
-                        Dim textgrn As String
-
-                        textmtf = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("MTFNumber").ToString), "-", SQL.DBDT.Rows(i - 1)("MTFNumber"))
-                        textgrn = If(String.IsNullOrEmpty(SQL.DBDT.Rows(i - 1)("GRN").ToString), "-", SQL.DBDT.Rows(i - 1)("GRN"))
-
-                        dgvLog.Rows.Add(New Object() {i.ToString + ".", SQL.DBDT.Rows(i - 1)("RecordTime"), SQL.DBDT.Rows(i - 1)("PartNumber"), SQL.DBDT.Rows(i - 1)("CGID"),
-                                SQL.DBDT.Rows(i - 1)("Qty"), textout, SQL.DBDT.Rows(i - 1)("Rack"), textgrn, textmtf, texttype,
-                                SQL.DBDT.Rows(i - 1)("Updater"), SQL.DBDT.Rows(i - 1)("Remark")})
-                    Next
-                Else
-                    dgvLog.Rows.Clear()
-                End If
-
+                LoadData(If(pageType = 0, 999, pageType - 1))
             Catch ex As Exception
                 Exit Sub
             End Try
-
         End If
     End Sub
 
@@ -432,18 +278,38 @@
     End Sub
 
     Private Sub CalcToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CalcToolStripMenuItem.Click
-        If dgvLog.SelectedRows.Count > 0 Then
-            Dim total As Integer = 0
-            For Each row As DataGridViewRow In dgvLog.SelectedRows
-                If row.Cells("Quantity Out").Value.ToString().StartsWith("+") Or row.Cells("Quantity Out").Value.ToString() = "-" Then
-                    total += 0
-                Else
-                    total += CInt(row.Cells("Quantity Out").Value)
-                End If
-            Next
-            MessageBox.Show("Total Quantity Out: " & total)
-        Else
-            MessageBox.Show("Please select at least one row before pressing the calculate button.")
-        End If
+        CalculateFunction(0)
+    End Sub
+
+    Private Sub btnFirst_Click(sender As Object, e As EventArgs) Handles btnFirst.Click
+        ' Set current page to 1 and reload data
+        currentPage = 1
+        LoadDatatoDGV()
+        UpdateNavButtons()
+    End Sub
+
+    Private Sub btnPrev_Click(sender As Object, e As EventArgs) Handles btnPrev.Click
+        ' Decrement current page and reload data
+        currentPage -= 1
+        LoadDatatoDGV()
+        UpdateNavButtons()
+    End Sub
+
+    Private Sub btnNext_Click(sender As Object, e As EventArgs) Handles btnNext.Click
+        ' Increment current page and reload data
+        currentPage += 1
+        LoadDatatoDGV()
+        UpdateNavButtons()
+    End Sub
+
+    Private Sub btnLast_Click(sender As Object, e As EventArgs) Handles btnLast.Click
+        ' Set current page to last page and reload data
+        currentPage = totalPages
+        LoadDatatoDGV()
+        UpdateNavButtons()
+    End Sub
+
+    Private Sub CalculateTotalOfQuantityInToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CalculateTotalOfQuantityInToolStripMenuItem.Click
+        CalculateFunction(1)
     End Sub
 End Class

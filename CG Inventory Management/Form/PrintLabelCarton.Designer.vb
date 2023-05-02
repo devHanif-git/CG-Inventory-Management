@@ -23,7 +23,6 @@ Partial Class PrintCartonLabel
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(PrintCartonLabel))
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
@@ -36,19 +35,10 @@ Partial Class PrintCartonLabel
         Me.btnprint1 = New System.Windows.Forms.Button()
         Me.btnno = New System.Windows.Forms.Button()
         Me.Panel1 = New System.Windows.Forms.Panel()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.Panel1.SuspendLayout()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
-        '
-        'PictureBox1
-        '
-        Me.PictureBox1.Image = CType(resources.GetObject("PictureBox1.Image"), System.Drawing.Image)
-        Me.PictureBox1.Location = New System.Drawing.Point(12, 12)
-        Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(68, 67)
-        Me.PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
-        Me.PictureBox1.TabIndex = 0
-        Me.PictureBox1.TabStop = False
         '
         'Label1
         '
@@ -71,7 +61,7 @@ Partial Class PrintCartonLabel
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(86, 91)
+        Me.Label3.Location = New System.Drawing.Point(86, 75)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(104, 20)
         Me.Label3.TabIndex = 3
@@ -80,7 +70,7 @@ Partial Class PrintCartonLabel
         'lblpn
         '
         Me.lblpn.AutoSize = True
-        Me.lblpn.Location = New System.Drawing.Point(196, 91)
+        Me.lblpn.Location = New System.Drawing.Point(196, 75)
         Me.lblpn.Name = "lblpn"
         Me.lblpn.Size = New System.Drawing.Size(28, 20)
         Me.lblpn.TabIndex = 4
@@ -89,7 +79,7 @@ Partial Class PrintCartonLabel
         'lblcgcode
         '
         Me.lblcgcode.AutoSize = True
-        Me.lblcgcode.Location = New System.Drawing.Point(176, 111)
+        Me.lblcgcode.Location = New System.Drawing.Point(176, 95)
         Me.lblcgcode.Name = "lblcgcode"
         Me.lblcgcode.Size = New System.Drawing.Size(69, 20)
         Me.lblcgcode.TabIndex = 6
@@ -98,7 +88,7 @@ Partial Class PrintCartonLabel
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(86, 111)
+        Me.Label5.Location = New System.Drawing.Point(86, 95)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(84, 20)
         Me.Label5.TabIndex = 5
@@ -107,7 +97,7 @@ Partial Class PrintCartonLabel
         'lblqty
         '
         Me.lblqty.AutoSize = True
-        Me.lblqty.Location = New System.Drawing.Point(204, 131)
+        Me.lblqty.Location = New System.Drawing.Point(204, 115)
         Me.lblqty.Name = "lblqty"
         Me.lblqty.Size = New System.Drawing.Size(32, 20)
         Me.lblqty.TabIndex = 8
@@ -116,7 +106,7 @@ Partial Class PrintCartonLabel
         'Label7
         '
         Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(86, 131)
+        Me.Label7.Location = New System.Drawing.Point(86, 115)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(112, 20)
         Me.Label7.TabIndex = 7
@@ -124,7 +114,7 @@ Partial Class PrintCartonLabel
         '
         'btnprint2
         '
-        Me.btnprint2.Location = New System.Drawing.Point(202, 16)
+        Me.btnprint2.Location = New System.Drawing.Point(200, 5)
         Me.btnprint2.Name = "btnprint2"
         Me.btnprint2.Size = New System.Drawing.Size(87, 36)
         Me.btnprint2.TabIndex = 9
@@ -133,7 +123,7 @@ Partial Class PrintCartonLabel
         '
         'btnprint1
         '
-        Me.btnprint1.Location = New System.Drawing.Point(109, 16)
+        Me.btnprint1.Location = New System.Drawing.Point(107, 5)
         Me.btnprint1.Name = "btnprint1"
         Me.btnprint1.Size = New System.Drawing.Size(87, 36)
         Me.btnprint1.TabIndex = 10
@@ -142,7 +132,7 @@ Partial Class PrintCartonLabel
         '
         'btnno
         '
-        Me.btnno.Location = New System.Drawing.Point(295, 16)
+        Me.btnno.Location = New System.Drawing.Point(293, 5)
         Me.btnno.Name = "btnno"
         Me.btnno.Size = New System.Drawing.Size(87, 36)
         Me.btnno.TabIndex = 11
@@ -155,17 +145,28 @@ Partial Class PrintCartonLabel
         Me.Panel1.Controls.Add(Me.btnno)
         Me.Panel1.Controls.Add(Me.btnprint1)
         Me.Panel1.Controls.Add(Me.btnprint2)
-        Me.Panel1.Location = New System.Drawing.Point(-2, 172)
+        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.Panel1.Location = New System.Drawing.Point(0, 165)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(401, 100)
+        Me.Panel1.Size = New System.Drawing.Size(392, 45)
         Me.Panel1.TabIndex = 12
+        '
+        'PictureBox1
+        '
+        Me.PictureBox1.Image = CType(resources.GetObject("PictureBox1.Image"), System.Drawing.Image)
+        Me.PictureBox1.Location = New System.Drawing.Point(12, 12)
+        Me.PictureBox1.Name = "PictureBox1"
+        Me.PictureBox1.Size = New System.Drawing.Size(68, 67)
+        Me.PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
+        Me.PictureBox1.TabIndex = 0
+        Me.PictureBox1.TabStop = False
         '
         'PrintCartonLabel
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(392, 236)
+        Me.ClientSize = New System.Drawing.Size(392, 210)
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.lblqty)
         Me.Controls.Add(Me.Label7)
@@ -184,8 +185,8 @@ Partial Class PrintCartonLabel
         Me.Name = "PrintCartonLabel"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Print Carton Label"
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel1.ResumeLayout(False)
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

@@ -2,7 +2,7 @@
     Public SQL As New SQLControl
     Dim OldID As String = ""
     Private Sub frmAdmin_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Show()
+        Loading.Show()
         dgvUsers.DoubleBuffered(True)
         Guna2GroupBox1.Left = (Guna2GroupBox1.Parent.Width \ 2) - (Guna2GroupBox1.Width \ 2) 'horizontal centering
         'Guna2GroupBox1.Top = (Guna2GroupBox1.Parent.Height \ 2) - (Guna2GroupBox1.Height \ 2) ' Ver centering
@@ -25,11 +25,7 @@
         mb = hw.GetMotherBoardID()
         mac = hw.GetMACAddress()
 
-        'MsgBox(cpu & "   " & hdd & "   " & mb & "   " & mac)
-
         Dim hwid As String = Strings.UCase(hw.getMD5Hash(cpu & hdd & mb & mac))
-
-        ' MessageBox.Show(Strings.UCase(hwid))
 
         txtHWID.Text = hwid
 
@@ -59,6 +55,8 @@
         LoadDatatoDGV()
 
         dgvUsers_CellClick(Nothing, Nothing)
+        Loading.Close()
+        Me.Show()
     End Sub
     Private Sub Disable()
         txtEmail.Enabled = False
@@ -118,38 +116,38 @@
         Next
     End Sub
     Private Sub SetupDGV()
-        Dim dataGridViewImageColumn As DataGridViewImageColumn = New DataGridViewImageColumn()
-        Dim image As Image = My.Resources.useractive
-        dataGridViewImageColumn.Image = image
-        dataGridViewImageColumn.HeaderText = ""
-        dataGridViewImageColumn.Name = "Status Icon"
-        Dim dataGridViewRec As DataGridView = dgvUsers
+        Dim dgvImageColumn As New DataGridViewImageColumn With {
+            .Image = My.Resources.useractive,
+            .HeaderText = "",
+            .Name = "Status Icon",
+            .Width = 28
+        }
 
-        dataGridViewRec.RowHeadersVisible = False
-        dataGridViewRec.ColumnCount = 7
+        With dgvUsers
+            .RowHeadersVisible = False
+            .ColumnCount = 7
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            .AutoResizeColumns()
+            .RowTemplate.Height = 40
+            .AllowUserToResizeRows = False
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(218, 238, 255)
 
-        dataGridViewRec.Columns.Insert(0, dataGridViewImageColumn)
-        dataGridViewRec.Columns(1).Name = "No."
-        dataGridViewRec.Columns(2).Name = "Employee ID"
-        dataGridViewRec.Columns(3).Name = "Name"
-        dataGridViewRec.Columns(4).Name = "Password"
-        dataGridViewRec.Columns(5).Name = "User Group"
-        dataGridViewRec.Columns(6).Name = "User Level"
-        dataGridViewRec.Columns(7).Name = "Status"
+            .Columns.Insert(0, dgvImageColumn)
 
-        dataGridViewRec.Columns("No.").SortMode = DataGridViewColumnSortMode.NotSortable
-        dataGridViewRec.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-        dataGridViewRec.AutoResizeColumns()
+            Dim columnNames As String() = {"No.", "Employee ID", "Name", "Password", "User Group", "User Level", "Status"}
 
-        dataGridViewRec.Columns("Status Icon").Width = 28
-        dataGridViewRec.Columns("No.").Width = 40
-        dataGridViewRec.Columns("Name").Width = 350
+            For i As Integer = 1 To .ColumnCount - 1
+                .Columns(i).Name = columnNames(i - 1)
+            Next
 
-        dataGridViewRec.RowTemplate.Height = 40
-        dataGridViewRec.AllowUserToResizeRows = False
+            .Columns("Status Icon").Width = 28
+            .Columns("No.").Width = 40
+            .Columns("Name").Width = 350
 
-        dataGridViewRec.RowsDefaultCellStyle.BackColor = Color.White
-        dataGridViewRec.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(218, 238, 255)
+            .Columns("No.").SortMode = DataGridViewColumnSortMode.NotSortable
+        End With
+
     End Sub
     Private Sub SetupGroupLvl()
         txtUGroup.Items.Add("Select Group")

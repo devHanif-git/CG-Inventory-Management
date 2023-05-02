@@ -1,6 +1,6 @@
 ﻿Public Class frmMain
     Private currentChildForm As Form
-    Dim hwid As String = ""
+    Public hwid As String = ""
     Public Sub New()
         ' This call is required by the designer.'
         InitializeComponent()
@@ -30,31 +30,10 @@
     End Sub
 
     Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Show()
-        'HWID
-        Dim hw As New clsComputerInfo
-
-        Dim hdd As String
-        Dim cpu As String
-        Dim mb As String
-        Dim mac As String
-
-        cpu = hw.GetProcessorId()
-        hdd = hw.GetVolumeSerial("C")
-        mb = hw.GetMotherBoardID()
-        mac = hw.GetMACAddress()
-
-        'MsgBox(cpu & "   " & hdd & "   " & mb & "   " & mac)
-
-        hwid = Strings.UCase(hw.getMD5Hash(cpu & hdd & mb & mac))
-
-        ' MessageBox.Show(Strings.UCase(hwid))
-
-        'TextBox1.Text = hwid
-        'MsgBox(hwid)
-
-        'END HWID
+        Loading.Show()
         OpenChildForm(New frmInventory)
+        Me.Show()
+        Loading.Close()
     End Sub
 
     Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click

@@ -34,6 +34,7 @@ Partial Class frmEditPN
         Me.txtPD = New System.Windows.Forms.TextBox()
         Me.txtQPP = New System.Windows.Forms.NumericUpDown()
         Me.btnSave = New Guna.UI2.WinForms.Guna2Button()
+        Me.btnCancel = New Guna.UI2.WinForms.Guna2Button()
         CType(Me.txtQPP, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -76,7 +77,7 @@ Partial Class frmEditPN
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(272, 110)
+        Me.Label5.Location = New System.Drawing.Point(272, 132)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(96, 20)
         Me.Label5.TabIndex = 4
@@ -113,13 +114,13 @@ Partial Class frmEditPN
         Me.txtPD.Location = New System.Drawing.Point(276, 32)
         Me.txtPD.Multiline = True
         Me.txtPD.Name = "txtPD"
-        Me.txtPD.Size = New System.Drawing.Size(276, 59)
+        Me.txtPD.Size = New System.Drawing.Size(276, 88)
         Me.txtPD.TabIndex = 9
         '
         'txtQPP
         '
         Me.txtQPP.Font = New System.Drawing.Font("Century Gothic", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtQPP.Location = New System.Drawing.Point(276, 133)
+        Me.txtQPP.Location = New System.Drawing.Point(276, 155)
         Me.txtQPP.Maximum = New Decimal(New Integer() {80000, 0, 0, 0})
         Me.txtQPP.Name = "txtQPP"
         Me.txtQPP.Size = New System.Drawing.Size(92, 31)
@@ -138,17 +139,37 @@ Partial Class frmEditPN
         Me.btnSave.ForeColor = System.Drawing.Color.Black
         Me.btnSave.Image = Global.CG_Inventory_Management.My.Resources.Resources.edit
         Me.btnSave.ImageSize = New System.Drawing.Size(25, 25)
-        Me.btnSave.Location = New System.Drawing.Point(428, 146)
+        Me.btnSave.Location = New System.Drawing.Point(428, 197)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(124, 39)
         Me.btnSave.TabIndex = 28
         Me.btnSave.Text = "Save"
         '
+        'btnCancel
+        '
+        Me.btnCancel.BorderColor = System.Drawing.Color.DarkGray
+        Me.btnCancel.BorderThickness = 1
+        Me.btnCancel.DisabledState.BorderColor = System.Drawing.Color.DarkGray
+        Me.btnCancel.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray
+        Me.btnCancel.DisabledState.FillColor = System.Drawing.Color.FromArgb(CType(CType(169, Byte), Integer), CType(CType(169, Byte), Integer), CType(CType(169, Byte), Integer))
+        Me.btnCancel.DisabledState.ForeColor = System.Drawing.Color.FromArgb(CType(CType(141, Byte), Integer), CType(CType(141, Byte), Integer), CType(CType(141, Byte), Integer))
+        Me.btnCancel.FillColor = System.Drawing.SystemColors.ControlLight
+        Me.btnCancel.Font = New System.Drawing.Font("Century Gothic", 12.0!)
+        Me.btnCancel.ForeColor = System.Drawing.Color.Black
+        Me.btnCancel.Image = Global.CG_Inventory_Management.My.Resources.Resources.delete
+        Me.btnCancel.ImageSize = New System.Drawing.Size(25, 25)
+        Me.btnCancel.Location = New System.Drawing.Point(16, 197)
+        Me.btnCancel.Name = "btnCancel"
+        Me.btnCancel.Size = New System.Drawing.Size(124, 39)
+        Me.btnCancel.TabIndex = 29
+        Me.btnCancel.Text = "Cancel"
+        '
         'frmEditPN
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(564, 197)
+        Me.ClientSize = New System.Drawing.Size(564, 249)
+        Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.txtQPP)
         Me.Controls.Add(Me.txtPD)
@@ -186,4 +207,5 @@ Partial Class frmEditPN
     Friend WithEvents txtPD As TextBox
     Friend WithEvents txtQPP As NumericUpDown
     Friend WithEvents btnSave As Guna.UI2.WinForms.Guna2Button
+    Friend WithEvents btnCancel As Guna.UI2.WinForms.Guna2Button
 End Class

@@ -48,8 +48,8 @@ Partial Class frmIncoming
         Me.cbxStockIn = New System.Windows.Forms.CheckBox()
         Me.Guna2GroupBox1 = New Guna.UI2.WinForms.Guna2GroupBox()
         Me.cbxLoc = New System.Windows.Forms.ComboBox()
-        Me.Label11 = New System.Windows.Forms.Label()
         Me.Label10 = New System.Windows.Forms.Label()
+        Me.Label11 = New System.Windows.Forms.Label()
         Me.txtEmployeeID = New System.Windows.Forms.TextBox()
         Me.MaskedTextBox1 = New System.Windows.Forms.MaskedTextBox()
         CType(Me.txtQty, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -96,7 +96,7 @@ Partial Class frmIncoming
         Me.txtGRN.Location = New System.Drawing.Point(225, 94)
         Me.txtGRN.Name = "txtGRN"
         Me.txtGRN.Size = New System.Drawing.Size(154, 31)
-        Me.txtGRN.TabIndex = 4
+        Me.txtGRN.TabIndex = 3
         '
         'txtDC
         '
@@ -227,7 +227,7 @@ Partial Class frmIncoming
         Me.txtPrintQ.Maximum = New Decimal(New Integer() {50, 0, 0, 0})
         Me.txtPrintQ.Name = "txtPrintQ"
         Me.txtPrintQ.Size = New System.Drawing.Size(59, 47)
-        Me.txtPrintQ.TabIndex = 5
+        Me.txtPrintQ.TabIndex = 4
         Me.txtPrintQ.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'Label8
@@ -273,7 +273,7 @@ Partial Class frmIncoming
         Me.txtRemark.Location = New System.Drawing.Point(154, 203)
         Me.txtRemark.Name = "txtRemark"
         Me.txtRemark.Size = New System.Drawing.Size(441, 31)
-        Me.txtRemark.TabIndex = 6
+        Me.txtRemark.TabIndex = 5
         '
         'txtMsgLog
         '
@@ -309,7 +309,7 @@ Partial Class frmIncoming
         '
         Me.cbxStockIn.AutoSize = True
         Me.cbxStockIn.Font = New System.Drawing.Font("Century Gothic", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cbxStockIn.Location = New System.Drawing.Point(986, 370)
+        Me.cbxStockIn.Location = New System.Drawing.Point(469, 260)
         Me.cbxStockIn.Name = "cbxStockIn"
         Me.cbxStockIn.Size = New System.Drawing.Size(227, 27)
         Me.cbxStockIn.TabIndex = 27
@@ -319,15 +319,13 @@ Partial Class frmIncoming
         'Guna2GroupBox1
         '
         Me.Guna2GroupBox1.Controls.Add(Me.cbxLoc)
-        Me.Guna2GroupBox1.Controls.Add(Me.Label11)
         Me.Guna2GroupBox1.Controls.Add(Me.Label10)
-        Me.Guna2GroupBox1.Controls.Add(Me.txtEmployeeID)
         Me.Guna2GroupBox1.CustomBorderColor = System.Drawing.Color.Maroon
         Me.Guna2GroupBox1.Font = New System.Drawing.Font("Century Gothic", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Guna2GroupBox1.ForeColor = System.Drawing.Color.White
-        Me.Guna2GroupBox1.Location = New System.Drawing.Point(36, 268)
+        Me.Guna2GroupBox1.Location = New System.Drawing.Point(469, 293)
         Me.Guna2GroupBox1.Name = "Guna2GroupBox1"
-        Me.Guna2GroupBox1.Size = New System.Drawing.Size(944, 277)
+        Me.Guna2GroupBox1.Size = New System.Drawing.Size(418, 113)
         Me.Guna2GroupBox1.TabIndex = 28
         Me.Guna2GroupBox1.Text = "Stock In After Printing."
         Me.Guna2GroupBox1.Visible = False
@@ -337,23 +335,10 @@ Partial Class frmIncoming
         Me.cbxLoc.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbxLoc.Font = New System.Drawing.Font("Century Gothic", 14.25!, System.Drawing.FontStyle.Bold)
         Me.cbxLoc.FormattingEnabled = True
-        Me.cbxLoc.Location = New System.Drawing.Point(419, 103)
+        Me.cbxLoc.Location = New System.Drawing.Point(163, 61)
         Me.cbxLoc.Name = "cbxLoc"
         Me.cbxLoc.Size = New System.Drawing.Size(235, 31)
         Me.cbxLoc.TabIndex = 32
-        '
-        'Label11
-        '
-        Me.Label11.AutoSize = True
-        Me.Label11.BackColor = System.Drawing.Color.Transparent
-        Me.Label11.Font = New System.Drawing.Font("Century Gothic", 20.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label11.ForeColor = System.Drawing.Color.Black
-        Me.Label11.Location = New System.Drawing.Point(224, 156)
-        Me.Label11.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(188, 32)
-        Me.Label11.TabIndex = 31
-        Me.Label11.Text = "Employee ID:"
         '
         'Label10
         '
@@ -361,22 +346,35 @@ Partial Class frmIncoming
         Me.Label10.BackColor = System.Drawing.Color.Transparent
         Me.Label10.Font = New System.Drawing.Font("Century Gothic", 20.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label10.ForeColor = System.Drawing.Color.Black
-        Me.Label10.Location = New System.Drawing.Point(278, 102)
+        Me.Label10.Location = New System.Drawing.Point(22, 60)
         Me.Label10.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label10.Name = "Label10"
         Me.Label10.Size = New System.Drawing.Size(134, 32)
         Me.Label10.TabIndex = 30
         Me.Label10.Text = "Location:"
         '
+        'Label11
+        '
+        Me.Label11.AutoSize = True
+        Me.Label11.BackColor = System.Drawing.Color.Transparent
+        Me.Label11.Font = New System.Drawing.Font("Century Gothic", 20.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label11.ForeColor = System.Drawing.Color.Black
+        Me.Label11.Location = New System.Drawing.Point(30, 256)
+        Me.Label11.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label11.Name = "Label11"
+        Me.Label11.Size = New System.Drawing.Size(188, 32)
+        Me.Label11.TabIndex = 31
+        Me.Label11.Text = "Employee ID:"
+        '
         'txtEmployeeID
         '
         Me.txtEmployeeID.BackColor = System.Drawing.Color.Yellow
         Me.txtEmployeeID.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.txtEmployeeID.Font = New System.Drawing.Font("Century Gothic", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtEmployeeID.Location = New System.Drawing.Point(419, 157)
+        Me.txtEmployeeID.Location = New System.Drawing.Point(225, 257)
         Me.txtEmployeeID.Name = "txtEmployeeID"
         Me.txtEmployeeID.Size = New System.Drawing.Size(235, 31)
-        Me.txtEmployeeID.TabIndex = 29
+        Me.txtEmployeeID.TabIndex = 6
         '
         'MaskedTextBox1
         '
@@ -393,8 +391,10 @@ Partial Class frmIncoming
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1278, 823)
         Me.Controls.Add(Me.MaskedTextBox1)
+        Me.Controls.Add(Me.Label11)
         Me.Controls.Add(Me.Guna2GroupBox1)
         Me.Controls.Add(Me.cbxStockIn)
+        Me.Controls.Add(Me.txtEmployeeID)
         Me.Controls.Add(Me.btnPrint)
         Me.Controls.Add(Me.txtMsgLog)
         Me.Controls.Add(Me.Label9)

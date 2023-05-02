@@ -1,6 +1,10 @@
 ﻿Public Class frmInventoryPart
     Public SQL As New SQLControl
 
+    Private searchMode As Boolean
+    Private searchType As String = ""
+    Private searchText As String = ""
+
     Private Sub frmInventoryPart_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Show()
         dgvInventory.DoubleBuffered(True)
@@ -11,49 +15,52 @@
     End Sub
 
     Private Sub LoadDatatoInventoryPart()
-        Try
-            dgvInventory.Rows.Clear()
+        dgvInventory.Rows.Clear()
 
+        If searchMode Then
+            SQL.AddParam("@pn", lblpn.Text)
+            SQL.AddParam("@filter", "%" & searchText & "%")
+
+            SQL.ExecQuery("SELECT * FROM Inventory WHERE PartNumber = @pn AND " & searchType & " LIKE @filter ORDER BY DateCode, Qty")
+        Else
             SQL.AddParam("@pn", lblpn.Text)
             SQL.ExecQuery("SELECT * FROM Inventory WHERE PartNumber = @pn ORDER BY DateCode, Qty")
+        End If
 
-            If SQL.HasException(True) Then Exit Sub
+        If SQL.HasException(True) Then Exit Sub
 
-            'MsgBox(SQL.RecordCount)
-            If SQL.RecordCount > 0 Then
-                For i As Integer = 1 To SQL.DBDT.Rows.Count
-                    Dim textstate As String = ""
+        'MsgBox(SQL.RecordCount)
+        If SQL.RecordCount > 0 Then
+            For i As Integer = 1 To SQL.DBDT.Rows.Count
+                Dim textstate As String = ""
 
-                    If SQL.DBDT.Rows(i - 1)("State") = 0 Then
-                        textstate = "-"
+                If SQL.DBDT.Rows(i - 1)("State") = 0 Then
+                    textstate = "-"
 
-                    ElseIf SQL.DBDT.Rows(i - 1)("State") = 1 Then
-                        textstate = "-"
-                    End If
+                ElseIf SQL.DBDT.Rows(i - 1)("State") = 1 Then
+                    textstate = "-"
+                End If
 
-                    dgvInventory.Rows.Add(New Object() {i.ToString + ".", SQL.DBDT.Rows(i - 1)("CGID"), SQL.DBDT.Rows(i - 1)("PartNumber"),
-                                                           SQL.DBDT.Rows(i - 1)("Rack"), SQL.DBDT.Rows(i - 1)("DateCode"), SQL.DBDT.Rows(i - 1)("Qty"),
-                                                           SQL.DBDT.Rows(i - 1)("GRN"), SQL.DBDT.Rows(i - 1)("UpdateTime"), SQL.DBDT.Rows(i - 1)("Updater"),
-                                                           textstate, SQL.DBDT.Rows(i - 1)("Remark")})
+                dgvInventory.Rows.Add(New Object() {i.ToString + ".", SQL.DBDT.Rows(i - 1)("CGID"), SQL.DBDT.Rows(i - 1)("PartNumber"),
+                                                       SQL.DBDT.Rows(i - 1)("Rack"), SQL.DBDT.Rows(i - 1)("DateCode"), SQL.DBDT.Rows(i - 1)("Qty"),
+                                                       SQL.DBDT.Rows(i - 1)("GRN"), SQL.DBDT.Rows(i - 1)("UpdateTime"), SQL.DBDT.Rows(i - 1)("Updater"),
+                                                       textstate, SQL.DBDT.Rows(i - 1)("Remark")})
 
-                    If textstate = "STATE 0" Then
-                        'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.FromArgb(255, 192, 192)
+                If textstate = "STATE 0" Then
+                    'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.FromArgb(255, 192, 192)
 
-                    ElseIf textstate = "STATE 1" Then
-                        'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.Blue
+                ElseIf textstate = "STATE 1" Then
+                    'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.Blue
 
-                    ElseIf textstate = "STATE 2" Then
-                        'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.Green
+                ElseIf textstate = "STATE 2" Then
+                    'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.Green
 
-                    ElseIf textstate = "STATE 3" Then
-                        'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.Black
-                    End If
+                ElseIf textstate = "STATE 3" Then
+                    'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.Black
+                End If
 
-                Next
-            End If
-        Catch ex As Exception
-            MsgBox(ex.Message)
-        End Try
+            Next
+        End If
 
     End Sub
 
@@ -94,65 +101,18 @@
             'no beep
             e.Handled = True
             Try
-                Dim filtertext As String = ""
-                If cbxSearch.SelectedIndex = 0 Then
-                    filtertext = "CGID"
-                ElseIf cbxSearch.SelectedIndex = 1 Then
-                    filtertext = "Rack"
-                ElseIf cbxSearch.SelectedIndex = 2 Then
-                    filtertext = "Qty"
-                ElseIf cbxSearch.SelectedIndex = 3 Then
-                    filtertext = "GRN"
-                ElseIf cbxSearch.SelectedIndex = 4 Then
-                    filtertext = "Remark"
-                End If
-
                 If txtSearch.Text = "" Then
-                    LoadDatatoInventoryPart()
+                    searchMode = False
                 Else
-                    SQL.AddParam("@pn", lblpn.Text)
-                    SQL.AddParam("@filter", "%" & txtSearch.Text.Trim.ToUpper & "%")
+                    searchMode = True
 
-                    SQL.ExecQuery("SELECT * FROM Inventory WHERE PartNumber = @pn AND " & filtertext & " LIKE @filter ORDER BY DateCode, Qty")
+                    Dim dataTypes As String() = {"CGID", "Rack", "Qty", "GRN", "Remark"}
 
-                    If SQL.HasException(True) Then Exit Sub
+                    searchType = dataTypes(cbxSearch.SelectedIndex)
 
-                    If SQL.RecordCount > 0 Then
-                        dgvInventory.Rows.Clear()
-                        For i As Integer = 1 To SQL.DBDT.Rows.Count
-                            Dim textstate As String = ""
-
-                            If SQL.DBDT.Rows(i - 1)("State") = 0 Then
-                                textstate = "-"
-
-                            ElseIf SQL.DBDT.Rows(i - 1)("State") = 1 Then
-                                textstate = "-"
-                            End If
-
-                            dgvInventory.Rows.Add(New Object() {i.ToString + ".", SQL.DBDT.Rows(i - 1)("CGID"), SQL.DBDT.Rows(i - 1)("PartNumber"),
-                                                           SQL.DBDT.Rows(i - 1)("Rack"), SQL.DBDT.Rows(i - 1)("DateCode"), SQL.DBDT.Rows(i - 1)("Qty"),
-                                                           SQL.DBDT.Rows(i - 1)("GRN"), SQL.DBDT.Rows(i - 1)("UpdateTime"), SQL.DBDT.Rows(i - 1)("Updater"),
-                                                           textstate, SQL.DBDT.Rows(i - 1)("Remark")})
-
-                            If textstate = "STATE 0" Then
-                                'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.FromArgb(255, 192, 192)
-
-                            ElseIf textstate = "STATE 1" Then
-                                'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.Blue
-
-                            ElseIf textstate = "STATE 2" Then
-                                'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.Green
-
-                            ElseIf textstate = "STATE 3" Then
-                                'dgvInventory.Rows(i - 1).Cells("State").Style.BackColor = Color.Black
-                            End If
-
-                        Next
-                    Else
-                        dgvInventory.Rows.Clear()
-                    End If
+                    searchText = txtSearch.Text.Trim.ToUpper
                 End If
-
+                LoadDatatoInventoryPart()
             Catch ex As Exception
                 Exit Sub
             End Try

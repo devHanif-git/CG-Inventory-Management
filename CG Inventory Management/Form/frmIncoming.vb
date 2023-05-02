@@ -1,33 +1,37 @@
 ﻿Imports System.Globalization
 Imports System.Text.RegularExpressions
+Imports Seagull.BarTender.Print
 Public Class frmIncoming
-    Dim _btw_path = ""
-    Dim _PrinterName = ""
+    'Public _btEngine As Engine
+    Private _btw_path = ""
+    Private _PrinterName = ""
     Public SQL As New SQLControl
 
     Dim flagpn As Boolean = False
     Private Sub frmIncoming_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Show()
+        '_btEngine = New Engine(True)
+        Cursor.Current = Cursors.WaitCursor
+        Loading.Show()
 
         lblMessageLogs.Left = (lblMessageLogs.Parent.Width \ 2) - (lblMessageLogs.Width \ 2) 'horizontal centering
         'Label1.Top = (Label1.Parent.Height \ 2) - (Label1.Height \ 2) ' Ver centering
 
-        txtPN.Focus()
-
-        Dim printers As Seagull.BarTender.Print.Printers = New Seagull.BarTender.Print.Printers()
+        Dim printers As Printers = New Printers()
 
         If printers.Count > 0 Then
             _PrinterName = printers.[Default].PrinterName
         End If
 
         _btw_path = Application.StartupPath + "\Barcode.btw"
+        Me.Show()
+        Loading.Close()
         txtPN.Focus()
     End Sub
 
     Private Sub GetRack()
         Dim name As String
 
-        Dim codes As String() = {"MCT", "KTXS", "ACM", "GPI", "PCBLITE"}
+        Dim codes As String() = {"MCT", "KTXS", "ACM", "GPI", "PCBLITE", "TEST"}
         name = Array.Find(codes, Function(x) txtCode.Text.Trim.Contains(x))
         If name = "PCBLITE" Then name = "PCB LITE"
         If name Is Nothing Then name = ""
@@ -60,40 +64,6 @@ Public Class frmIncoming
         For Each r As DataRow In SQL.DBDT.Rows
             cbxLoc.Items.Add(r("RackName"))
         Next
-    End Sub
-
-    Private Sub PrintBar(ByVal Optional isPreView As Boolean = False)
-        Using btEngine As Seagull.BarTender.Print.Engine = New Seagull.BarTender.Print.Engine(True)
-            Dim labelFormat As Seagull.BarTender.Print.LabelFormatDocument = btEngine.Documents.Open(_btw_path)
-
-            Try
-                'QR Code
-                labelFormat.SubStrings.SetSubString("pn", txtPN.Text.Trim)
-                labelFormat.SubStrings.SetSubString("cgid", txtCGID.Text.Trim)
-                labelFormat.SubStrings.SetSubString("grn", txtGRN.Text.Trim)
-                labelFormat.SubStrings.SetSubString("dc", txtDC.Text.Trim)
-                labelFormat.SubStrings.SetSubString("cgcode", txtCode.Text.Trim)
-                labelFormat.SubStrings.SetSubString("qty", txtQty.Value.ToString)
-                'Others
-            Catch ex As Exception
-                MessageBox.Show("Error in modifying content" & ex.Message, "Printing Error!")
-            End Try
-
-            If isPreView Then Return
-
-            If _PrinterName <> "" Then
-                labelFormat.PrintSetup.PrinterName = _PrinterName
-                labelFormat.Print("CGIM" & DateTime.Now, 5)
-
-                txtMsgLog.Text += "Print complete: " & txtCGID.Text & vbCrLf
-                txtMsgLog.Select(txtMsgLog.TextLength - 33, 33)
-                txtMsgLog.SelectionColor = Color.Green
-
-                txtPN.Focus()
-            Else
-                MessageBox.Show("Please select a printer first", "Select Printer!")
-            End If
-        End Using
     End Sub
 
     Private Sub txtQty_Enter(sender As Object, e As EventArgs) Handles txtQty.Enter
@@ -171,8 +141,7 @@ Public Class frmIncoming
             'no beep
             e.Handled = True
             Try
-                btnPrint.PerformClick()
-                txtPrintQ.Select(0, txtPrintQ.Text.Length)
+                txtEmployeeID.Focus()
             Catch ex As Exception
                 Exit Sub
             End Try
@@ -259,10 +228,11 @@ Public Class frmIncoming
             SQL.ExecQuery("UPDATE CGIDNum SET CGIDYYMM = @newyyMM, CGIDNo = 1")
 
             If SQL.HasException(True) Then Exit Sub
-            CGIDNo = "0"
+            CGIDNo = "1"
             CGIDyyMM = reformatted
         End If
 
+        'NEED TO EDIT HERE ALSO.
         If cbxStockIn.Checked = True Then
             'check rack and employee id if got proceed to next
             If cbxLoc.Text = "" Then
@@ -279,181 +249,278 @@ Public Class frmIncoming
 
                 If SQL.RecordCount > 0 Then
                     Loading.Show()
+                    If initEngine.bgwInitEngine.IsBusy Then
+                        ' Wait for the background worker to complete before accessing the engine
+                        While initEngine.bgwInitEngine.IsBusy
+                            Application.DoEvents()
+                        End While
+                    End If
+                    ' Open the label format
+                    Dim labelFormat As LabelFormatDocument = initEngine._btEngine.Documents.Open(_btw_path)
+                    Try
+                        'Loop and check the CGID number.
+                        For i As Integer = 1 To txtPrintQ.Value
+                            If CGIDNo <= 9 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n05 & CGIDNo
+                            End If
+                            If CGIDNo >= 10 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n04 & CGIDNo
+                            End If
+                            If CGIDNo >= 100 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n03 & CGIDNo
+                            End If
+                            If CGIDNo >= 1000 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n02 & CGIDNo
+                            End If
+                            If CGIDNo >= 10000 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n01 & CGIDNo
+                            End If
+                            If CGIDNo >= 100000 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n00 & CGIDNo
+                            End If
 
-                    For i As Integer = 1 To txtPrintQ.Value
-                        If CGIDNo <= 9 Then
-                            txtCGID.Text = "CGID-" & reformatted & "-" & n05 & CGIDNo
-                        End If
-                        If CGIDNo >= 10 Then
-                            txtCGID.Text = "CGID-" & reformatted & "-" & n04 & CGIDNo
-                        End If
-                        If CGIDNo >= 100 Then
-                            txtCGID.Text = "CGID-" & reformatted & "-" & n03 & CGIDNo
-                        End If
-                        If CGIDNo >= 1000 Then
-                            txtCGID.Text = "CGID-" & reformatted & "-" & n02 & CGIDNo
-                        End If
-                        If CGIDNo >= 10000 Then
-                            txtCGID.Text = "CGID-" & reformatted & "-" & n01 & CGIDNo
-                        End If
-                        If CGIDNo >= 100000 Then
-                            txtCGID.Text = "CGID-" & reformatted & "-" & n00 & CGIDNo
-                        End If
-
-                        Try
+                            'Convert date for SQL.
                             Dim strDate As DateTime
                             strDate = DateTime.Parse(txtDC.Text, System.Globalization.CultureInfo.CreateSpecificCulture("en-GB").DateTimeFormat)
                             Dim formatInfo As New System.Globalization.DateTimeFormatInfo()
                             formatInfo.LongDatePattern = "MM/dd/yyyy"
                             Dim strStartDate As String = strDate.ToString("MM/dd/yyyy", formatInfo)
 
+                            'Get string for printcode or QR.
                             Dim printcode As String = txtPN.Text.Trim & ";" & txtCGID.Text.Trim & ";" & txtGRN.Text.Trim & ";" & txtDC.Text.Trim & ";" & txtCode.Text.Trim
 
-                            SQL.AddParam("@printcode", printcode)
-                            SQL.AddParam("@pn", txtPN.Text.Trim)
-                            SQL.AddParam("@cgid", txtCGID.Text.Trim)
-                            SQL.AddParam("@grn", txtGRN.Text.Trim)
-                            SQL.AddParam("@dc", strStartDate)
-                            SQL.AddParam("@qty", txtQty.Value.ToString)
-                            SQL.AddParam("@cgcode", txtCode.Text.Trim)
-                            SQL.AddParam("@remark", txtRemark.Text.Trim)
+                            'Add param and INSERT into database.
+                            With SQL
+                                .AddParam("@printcode", printcode)
+                                .AddParam("@pn", txtPN.Text.Trim)
+                                .AddParam("@cgid", txtCGID.Text.Trim)
+                                .AddParam("@grn", txtGRN.Text.Trim)
+                                .AddParam("@dc", strStartDate)
+                                .AddParam("@qty", txtQty.Value.ToString)
+                                .AddParam("@cgcode", txtCode.Text.Trim)
+                                .AddParam("@remark", txtRemark.Text.Trim)
 
-                            SQL.ExecQuery("INSERT INTO PrintedCode(PrintCode, CGID, PartNumber, DateCode, CGCode, Qty, GRN, Remark) VALUES(@printcode, @cgid, @pn, @dc, @cgcode, @qty, @grn, @remark);")
+                                .ExecQuery("INSERT INTO PrintedCode(PrintCode, CGID, PartNumber, DateCode, CGCode, Qty, GRN, Remark) VALUES(@printcode, @cgid, @pn, @dc, @cgcode, @qty, @grn, @remark);")
 
-                            If SQL.HasException(True) Then Exit Sub
+                                If .HasException(True) Then Exit Sub
+                            End With
 
-                            PrintBar()
+                            ' Update the data source
+                            With labelFormat.SubStrings
+                                .SetSubString("pn", txtPN.Text.Trim)
+                                .SetSubString("cgid", txtCGID.Text.Trim)
+                                .SetSubString("grn", txtGRN.Text.Trim)
+                                .SetSubString("dc", txtDC.Text.Trim)
+                                .SetSubString("cgcode", txtCode.Text.Trim)
+                                .SetSubString("qty", txtQty.Value.ToString)
+                            End With
+
+                            ' Print the label(s)
+                            If Not String.IsNullOrEmpty(_PrinterName) Then
+                                labelFormat.PrintSetup.PrinterName = _PrinterName
+                                labelFormat.Print("CGIM" & DateTime.Now, 1500)
+                                txtMsgLog.Text += "Print complete: " & txtCGID.Text & vbCrLf
+                                txtMsgLog.Select(txtMsgLog.TextLength - 33, 33)
+                                txtMsgLog.SelectionColor = Color.Green
+                            Else
+                                MessageBox.Show("Please select a printer first", "Select Printer")
+                            End If
+
+                            'Increase the CGIDNo by 1 to database
                             CGIDNo += 1
-                            SQL.AddParam("@newno", CGIDNo)
-                            SQL.ExecQuery("UPDATE CGIDNum SET CGIDNo = @newno")
+                            With SQL
+                                .AddParam("@newno", CGIDNo)
+                                .ExecQuery("UPDATE CGIDNum SET CGIDNo = @newno")
 
-                            If SQL.HasException(True) Then Exit Sub
+                                If .HasException(True) Then Exit Sub
+                            End With
 
-                        Catch ex As Exception
-                            MsgBox(ex.Message)
-                        End Try
+                            'stock in function here ----------------------
+                            'Add Param and Insert to database
+                            With SQL
+                                .AddParam("@cgid", txtCGID.Text.Trim)
+                                .AddParam("@pn", txtPN.Text.Trim)
+                                .AddParam("@rack", cbxLoc.Text.Trim)
+                                .AddParam("@dc", strStartDate)
+                                .AddParam("@qty", txtQty.Value.ToString)
+                                .AddParam("@grn", txtGRN.Text.Trim)
+                                .AddParam("@uid", txtEmployeeID.Text.Trim)
+                                .AddParam("@remark", txtRemark.Text.Trim)
 
-                        'stock in function here
-                        Try
-                            Dim strDate As DateTime
-                            strDate = DateTime.Parse(txtDC.Text, System.Globalization.CultureInfo.CreateSpecificCulture("en-GB").DateTimeFormat)
-                            Dim formatInfo As New System.Globalization.DateTimeFormatInfo()
-                            formatInfo.LongDatePattern = "MM/dd/yyyy"
-                            Dim strStartDate As String = strDate.ToString("MM/dd/yyyy", formatInfo)
+                                .ExecQuery("INSERT INTO Inventory(CGID, PartNumber, Rack, DateCode, Qty, GRN, " _
+                                                 & "UpdateTime, Updater, State, Remark) " _
+                                                 & "VALUES(@cgid, @pn, @rack, @dc, @qty, @grn, GETDATE(), @uid, 0, @remark)")
 
-                            SQL.AddParam("@cgid", txtCGID.Text.Trim)
-                            SQL.AddParam("@pn", txtPN.Text.Trim)
-                            SQL.AddParam("@rack", cbxLoc.Text.Trim)
-                            SQL.AddParam("@dc", strStartDate)
-                            SQL.AddParam("@qty", txtQty.Value.ToString)
-                            SQL.AddParam("@grn", txtGRN.Text.Trim)
-                            SQL.AddParam("@uid", txtEmployeeID.Text.Trim)
-                            SQL.AddParam("@remark", txtRemark.Text.Trim)
+                                If .HasException(True) Then Exit Sub
+                            End With
 
-                            SQL.ExecQuery("INSERT INTO Inventory(CGID, PartNumber, Rack, DateCode, Qty, GRN, " _
-                                          & "UpdateTime, Updater, State, Remark) " _
-                                          & "VALUES(@cgid, @pn, @rack, @dc, @qty, @grn, GETDATE(), @uid, 0, @remark)")
+                            'Add Param and Insert to database
+                            With SQL
+                                .AddParam("@cgid", txtCGID.Text.Trim)
+                                .AddParam("@pn", txtPN.Text.Trim)
+                                .AddParam("@rack", cbxLoc.Text.Trim)
+                                .AddParam("@dc", strStartDate)
+                                .AddParam("@qty", txtQty.Value.ToString)
+                                .AddParam("@grn", txtGRN.Text.Trim)
+                                .AddParam("@uid", txtEmployeeID.Text.Trim)
+                                .AddParam("@remark", txtRemark.Text.Trim)
 
-                            If SQL.HasException(True) Then Exit Sub
+                                .ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Rack, GRN, Type, Updater, Remark) " _
+                                                 & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @rack, @grn, 1, @uid, @remark);")
 
-                            SQL.AddParam("@cgid", txtCGID.Text.Trim)
-                            SQL.AddParam("@pn", txtPN.Text.Trim)
-                            SQL.AddParam("@rack", cbxLoc.Text.Trim)
-                            SQL.AddParam("@dc", strStartDate)
-                            SQL.AddParam("@qty", txtQty.Value.ToString)
-                            SQL.AddParam("@grn", txtGRN.Text.Trim)
-                            SQL.AddParam("@uid", txtEmployeeID.Text.Trim)
-                            SQL.AddParam("@remark", txtRemark.Text.Trim)
+                                If .HasException(True) Then Exit Sub
+                            End With
 
-                            SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, Rack, GRN, Type, Updater, Remark) " _
-                                          & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @rack, @grn, 1, @uid, @remark);")
+                            'UPDATE TO USER
+                            With txtMsgLog
+                                .Text += "Stock in complete: " & txtCGID.Text & vbCrLf
+                                .Select(txtMsgLog.TextLength - 33, 33)
+                                .SelectionColor = Color.Green
+                            End With
 
-                            If SQL.HasException(True) Then Exit Sub
+                        Next
+                    Catch ex As Exception
+                        MsgBox(ex.Message, MsgBoxStyle.Critical)
+                    End Try
 
-                            txtMsgLog.Text += "Stock in complete: " & txtCGID.Text & vbCrLf
-                            txtMsgLog.Select(txtMsgLog.TextLength - 33, 33)
-                            txtMsgLog.SelectionColor = Color.Green
-
-                        Catch ex As Exception
-                            MsgBox(ex.Message, MsgBoxStyle.Critical)
-                        End Try
-                    Next
                     Loading.Close()
+                    txtPN.Focus()
+                    txtPN.SelectAll()
+                    'txtPrintQ.Focus()
+                    'txtPrintQ.Select(0, txtPrintQ.Value.ToString().Length)
                 Else
                     MessageBox.Show("Employee ID not found.", "Employee ID!")
                     txtEmployeeID.Focus()
                     txtEmployeeID.Select(0, txtEmployeeID.Text.Length)
                     Exit Sub
                 End If
-
             End If
         Else
-            Loading.Show()
+            If txtEmployeeID.Text = "" Then
+                MessageBox.Show("Please enter your employee id.", "Employee ID!")
+                txtEmployeeID.Focus()
+            Else
+                SQL.AddParam("@uid", txtEmployeeID.Text)
+                SQL.ExecQuery("SELECT TOP 1 * FROM Users Where UserID = @uid")
 
-            For i As Integer = 1 To txtPrintQ.Value
-                If CGIDNo <= 9 Then
-                    txtCGID.Text = "CGID-" & reformatted & "-" & n05 & CGIDNo
+                If SQL.RecordCount > 0 Then
+                    Loading.Show()
+                    If initEngine.bgwInitEngine.IsBusy Then
+                        ' Wait for the background worker to complete before accessing the engine
+                        While initEngine.bgwInitEngine.IsBusy
+                            Application.DoEvents()
+                        End While
+                    End If
+                    ' Open the label format
+                    Dim labelFormat As LabelFormatDocument = initEngine._btEngine.Documents.Open(_btw_path)
+                    Try
+                        'Loop and check the CGID number.
+                        For i As Integer = 1 To txtPrintQ.Value
+                            If CGIDNo <= 9 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n05 & CGIDNo
+                            End If
+                            If CGIDNo >= 10 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n04 & CGIDNo
+                            End If
+                            If CGIDNo >= 100 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n03 & CGIDNo
+                            End If
+                            If CGIDNo >= 1000 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n02 & CGIDNo
+                            End If
+                            If CGIDNo >= 10000 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n01 & CGIDNo
+                            End If
+                            If CGIDNo >= 100000 Then
+                                txtCGID.Text = "CGID-" & reformatted & "-" & n00 & CGIDNo
+                            End If
+
+                            'Convert date for SQL.
+                            Dim strDate As DateTime
+                            strDate = DateTime.Parse(txtDC.Text, System.Globalization.CultureInfo.CreateSpecificCulture("en-GB").DateTimeFormat)
+                            Dim formatInfo As New System.Globalization.DateTimeFormatInfo()
+                            formatInfo.LongDatePattern = "MM/dd/yyyy"
+                            Dim strStartDate As String = strDate.ToString("MM/dd/yyyy", formatInfo)
+
+                            'Get string for printcode or QR.
+                            Dim printcode As String = txtPN.Text.Trim & ";" & txtCGID.Text.Trim & ";" & txtGRN.Text.Trim & ";" & txtDC.Text.Trim & ";" & txtCode.Text.Trim
+
+                            'Add param and INSERT into database.
+                            With SQL
+                                .AddParam("@printcode", printcode)
+                                .AddParam("@pn", txtPN.Text.Trim)
+                                .AddParam("@cgid", txtCGID.Text.Trim)
+                                .AddParam("@grn", txtGRN.Text.Trim)
+                                .AddParam("@dc", strStartDate)
+                                .AddParam("@qty", txtQty.Value.ToString)
+                                .AddParam("@cgcode", txtCode.Text.Trim)
+                                .AddParam("@remark", txtRemark.Text.Trim)
+
+                                .ExecQuery("INSERT INTO PrintedCode(PrintCode, CGID, PartNumber, DateCode, CGCode, Qty, GRN, Remark) VALUES(@printcode, @cgid, @pn, @dc, @cgcode, @qty, @grn, @remark);")
+
+                                If .HasException(True) Then Exit Sub
+                            End With
+
+                            'Add param and INSERT into database.
+                            With SQL
+                                .AddParam("@pn", txtPN.Text.Trim)
+                                .AddParam("@cgid", txtCGID.Text.Trim)
+                                .AddParam("@grn", txtGRN.Text.Trim)
+                                .AddParam("@qty", txtQty.Value.ToString)
+                                .AddParam("@remark", txtRemark.Text.Trim)
+                                .AddParam("@uid", txtEmployeeID.Text.Trim)
+
+                                .ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, GRN, Type, Updater, Remark) " _
+                                & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @grn, 0, @uid, @remark);")
+
+                                If .HasException(True) Then Exit Sub
+                            End With
+
+                            ' Update the data source
+                            With labelFormat.SubStrings
+                                .SetSubString("pn", txtPN.Text.Trim)
+                                .SetSubString("cgid", txtCGID.Text.Trim)
+                                .SetSubString("grn", txtGRN.Text.Trim)
+                                .SetSubString("dc", txtDC.Text.Trim)
+                                .SetSubString("cgcode", txtCode.Text.Trim)
+                                .SetSubString("qty", txtQty.Value.ToString)
+                            End With
+
+                            ' Print the label(s)
+                            If Not String.IsNullOrEmpty(_PrinterName) Then
+                                labelFormat.PrintSetup.PrinterName = _PrinterName
+                                labelFormat.Print("CGIM" & DateTime.Now, 2000)
+
+                                'UPDATE TO USER
+                                txtMsgLog.Text += "Print complete: " & txtCGID.Text & vbCrLf
+                                txtMsgLog.Select(txtMsgLog.TextLength - 33, 33)
+                                txtMsgLog.SelectionColor = Color.Green
+                            Else
+                                MessageBox.Show("Please select a printer first", "Select Printer")
+                            End If
+
+                            'Increase the CGIDNo by 1 to database
+                            CGIDNo += 1
+                            SQL.AddParam("@newno", CGIDNo)
+                            SQL.ExecQuery("UPDATE CGIDNum SET CGIDNo = @newno")
+                            If SQL.HasException(True) Then Exit Sub
+                        Next
+                    Catch ex As Exception
+                        MsgBox(ex.Message, MsgBoxStyle.Critical)
+                    End Try
+                    Loading.Close()
+                    txtPN.Focus()
+                    txtPN.SelectAll()
+                    'txtPrintQ.Focus()
+                    'txtPrintQ.Select(0, txtPrintQ.Value.ToString().Length)
+                Else
+                    MessageBox.Show("Employee ID not found.", "Employee ID!")
+                    txtEmployeeID.Focus()
+                    txtEmployeeID.Select(0, txtEmployeeID.Text.Length)
+                    Exit Sub
                 End If
-                If CGIDNo >= 10 Then
-                    txtCGID.Text = "CGID-" & reformatted & "-" & n04 & CGIDNo
-                End If
-                If CGIDNo >= 100 Then
-                    txtCGID.Text = "CGID-" & reformatted & "-" & n03 & CGIDNo
-                End If
-                If CGIDNo >= 1000 Then
-                    txtCGID.Text = "CGID-" & reformatted & "-" & n02 & CGIDNo
-                End If
-                If CGIDNo >= 10000 Then
-                    txtCGID.Text = "CGID-" & reformatted & "-" & n01 & CGIDNo
-                End If
-                If CGIDNo >= 100000 Then
-                    txtCGID.Text = "CGID-" & reformatted & "-" & n00 & CGIDNo
-                End If
+            End If
 
-                Try
-                    Dim strDate As DateTime
-                    strDate = DateTime.Parse(txtDC.Text, System.Globalization.CultureInfo.CreateSpecificCulture("en-GB").DateTimeFormat)
-                    Dim formatInfo As New System.Globalization.DateTimeFormatInfo()
-                    formatInfo.LongDatePattern = "MM/dd/yyyy"
-                    Dim strStartDate As String = strDate.ToString("MM/dd/yyyy", formatInfo)
-
-                    Dim printcode As String = txtPN.Text.Trim & ";" & txtCGID.Text.Trim & ";" & txtGRN.Text.Trim & ";" & txtDC.Text.Trim & ";" & txtCode.Text.Trim
-
-                    SQL.AddParam("@printcode", printcode)
-                    SQL.AddParam("@pn", txtPN.Text.Trim)
-                    SQL.AddParam("@cgid", txtCGID.Text.Trim)
-                    SQL.AddParam("@grn", txtGRN.Text.Trim)
-                    SQL.AddParam("@dc", strStartDate)
-                    SQL.AddParam("@qty", txtQty.Value.ToString)
-                    SQL.AddParam("@cgcode", txtCode.Text.Trim)
-                    SQL.AddParam("@remark", txtRemark.Text.Trim)
-
-                    SQL.ExecQuery("INSERT INTO PrintedCode(PrintCode, CGID, PartNumber, DateCode, CGCode, Qty, GRN, Remark) VALUES(@printcode, @cgid, @pn, @dc, @cgcode, @qty, @grn, @remark);")
-                    If SQL.HasException(True) Then Exit Sub
-
-
-                    SQL.AddParam("@pn", txtPN.Text.Trim)
-                    SQL.AddParam("@cgid", txtCGID.Text.Trim)
-                    SQL.AddParam("@grn", txtGRN.Text.Trim)
-                    SQL.AddParam("@qty", txtQty.Value.ToString)
-                    SQL.AddParam("@remark", txtRemark.Text.Trim)
-
-                    SQL.ExecQuery("INSERT INTO PartLog(RecordTime, PartNumber, CGID, Qty, QtyOut, GRN, Type, Remark) " _
-                    & "VALUES(GETDATE(), @pn, @cgid, @qty, 0, @grn, 0, @remark);")
-
-                    If SQL.HasException(True) Then Exit Sub
-                    PrintBar()
-                    CGIDNo += 1
-                    SQL.AddParam("@newno", CGIDNo)
-                    SQL.ExecQuery("UPDATE CGIDNum SET CGIDNo = @newno")
-
-                    If SQL.HasException(True) Then Exit Sub
-
-                Catch ex As Exception
-                    MsgBox(ex.Message)
-                End Try
-            Next
-            Loading.Close()
         End If
 
         If cbxClear.Checked = False Then
@@ -468,6 +535,9 @@ Public Class frmIncoming
             txtCGID.Text = ""
             txtDesc.Text = ""
             txtRemark.Text = ""
+            txtCGID.Text = ""
+            cbxLoc.Text = String.Empty
+            cbxLoc.SelectedIndex = -1
         End If
     End Sub
 
@@ -554,7 +624,7 @@ Public Class frmIncoming
         Dim value As String = txtGRN.Text
 
         ' Check if the textbox has reached the maximum length of the pattern
-        If txtGRN.Text.Length >= 12 And Not e.KeyCode = Keys.Back Then
+        If txtGRN.Text.Length >= 12 And Not e.KeyCode = Keys.Back And Not e.KeyCode = Keys.Enter Then
             ' If the textbox has reached the maximum length, prevent any further input
             e.SuppressKeyPress = True
             Return
@@ -600,7 +670,7 @@ Public Class frmIncoming
             ' If the backspace key was pressed, skip the code that adds the "/" character
             Return
         End If
-        
+
         ' Check if the third character is not a "/"
         If value.Length = 2 AndAlso value(1) <> "/" Then
 

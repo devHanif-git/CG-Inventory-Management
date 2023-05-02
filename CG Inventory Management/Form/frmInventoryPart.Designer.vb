@@ -61,15 +61,15 @@ Partial Class frmInventoryPart
         Me.Panel2.Controls.Add(Me.Label2)
         Me.Panel2.Controls.Add(Me.cbxSearch)
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.Panel2.Location = New System.Drawing.Point(0, 712)
+        Me.Panel2.Location = New System.Drawing.Point(0, 698)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(1175, 85)
+        Me.Panel2.Size = New System.Drawing.Size(1175, 99)
         Me.Panel2.TabIndex = 3
         '
         'Panel8
         '
         Me.Panel8.BackColor = System.Drawing.Color.DarkGray
-        Me.Panel8.Location = New System.Drawing.Point(1009, 35)
+        Me.Panel8.Location = New System.Drawing.Point(1009, 41)
         Me.Panel8.Name = "Panel8"
         Me.Panel8.Size = New System.Drawing.Size(1, 35)
         Me.Panel8.TabIndex = 93
@@ -87,7 +87,7 @@ Partial Class frmInventoryPart
         Me.btnExport.ForeColor = System.Drawing.Color.Black
         Me.btnExport.Image = CType(resources.GetObject("btnExport.Image"), System.Drawing.Image)
         Me.btnExport.ImageSize = New System.Drawing.Size(25, 25)
-        Me.btnExport.Location = New System.Drawing.Point(1027, 31)
+        Me.btnExport.Location = New System.Drawing.Point(1027, 37)
         Me.btnExport.Name = "btnExport"
         Me.btnExport.Size = New System.Drawing.Size(123, 41)
         Me.btnExport.TabIndex = 96
@@ -96,7 +96,7 @@ Partial Class frmInventoryPart
         'Panel6
         '
         Me.Panel6.BackColor = System.Drawing.Color.Black
-        Me.Panel6.Location = New System.Drawing.Point(-14, 84)
+        Me.Panel6.Location = New System.Drawing.Point(-14, 106)
         Me.Panel6.Name = "Panel6"
         Me.Panel6.Size = New System.Drawing.Size(2180, 10)
         Me.Panel6.TabIndex = 1
@@ -107,7 +107,7 @@ Partial Class frmInventoryPart
         Me.Panel3.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel3.Location = New System.Drawing.Point(0, 0)
         Me.Panel3.Name = "Panel3"
-        Me.Panel3.Size = New System.Drawing.Size(1175, 21)
+        Me.Panel3.Size = New System.Drawing.Size(1175, 17)
         Me.Panel3.TabIndex = 0
         '
         'txtSearch
@@ -123,7 +123,7 @@ Partial Class frmInventoryPart
         Me.txtSearch.Font = New System.Drawing.Font("Century Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtSearch.ForeColor = System.Drawing.Color.Black
         Me.txtSearch.HoverState.BorderColor = System.Drawing.Color.FromArgb(CType(CType(94, Byte), Integer), CType(CType(148, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.txtSearch.Location = New System.Drawing.Point(405, 38)
+        Me.txtSearch.Location = New System.Drawing.Point(405, 44)
         Me.txtSearch.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtSearch.Name = "txtSearch"
         Me.txtSearch.PasswordChar = Global.Microsoft.VisualBasic.ChrW(0)
@@ -138,7 +138,7 @@ Partial Class frmInventoryPart
         Me.Label1.BackColor = System.Drawing.Color.Transparent
         Me.Label1.Font = New System.Drawing.Font("Century Gothic", 15.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label1.ForeColor = System.Drawing.Color.Black
-        Me.Label1.Location = New System.Drawing.Point(336, 40)
+        Me.Label1.Location = New System.Drawing.Point(336, 46)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(51, 25)
         Me.Label1.TabIndex = 95
@@ -150,7 +150,7 @@ Partial Class frmInventoryPart
         Me.Label2.BackColor = System.Drawing.Color.Transparent
         Me.Label2.Font = New System.Drawing.Font("Century Gothic", 15.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label2.ForeColor = System.Drawing.Color.Black
-        Me.Label2.Location = New System.Drawing.Point(12, 40)
+        Me.Label2.Location = New System.Drawing.Point(12, 46)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(83, 25)
         Me.Label2.TabIndex = 94
@@ -161,7 +161,7 @@ Partial Class frmInventoryPart
         Me.cbxSearch.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbxSearch.FormattingEnabled = True
         Me.cbxSearch.Items.AddRange(New Object() {"CGID", "Location", "Quantity", "GRN No.", "Remark"})
-        Me.cbxSearch.Location = New System.Drawing.Point(111, 38)
+        Me.cbxSearch.Location = New System.Drawing.Point(111, 44)
         Me.cbxSearch.Name = "cbxSearch"
         Me.cbxSearch.Size = New System.Drawing.Size(198, 28)
         Me.cbxSearch.TabIndex = 92
@@ -254,7 +254,7 @@ Partial Class frmInventoryPart
         Me.dgvInventory.Name = "dgvInventory"
         Me.dgvInventory.ReadOnly = True
         Me.dgvInventory.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvInventory.Size = New System.Drawing.Size(1175, 639)
+        Me.dgvInventory.Size = New System.Drawing.Size(1175, 625)
         Me.dgvInventory.TabIndex = 2
         '
         'Guna2ContextMenuStrip1
@@ -270,7 +270,7 @@ Partial Class frmInventoryPart
         Me.Guna2ContextMenuStrip1.RenderStyle.SelectionForeColor = System.Drawing.Color.White
         Me.Guna2ContextMenuStrip1.RenderStyle.SeparatorColor = System.Drawing.Color.Gainsboro
         Me.Guna2ContextMenuStrip1.RenderStyle.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault
-        Me.Guna2ContextMenuStrip1.Size = New System.Drawing.Size(200, 48)
+        Me.Guna2ContextMenuStrip1.Size = New System.Drawing.Size(200, 26)
         '
         'CalcToolStripMenuItem
         '

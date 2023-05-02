@@ -11,37 +11,25 @@ Public Class frmImport
     End Sub
 
     Private Sub SetupDGV()
-        Dim dataGridViewRec As DataGridView = dgvImport
+        With dgvImport
+            .RowHeadersVisible = False
+            .EnableHeadersVisualStyles = False
+            .ColumnCount = 5
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            .AutoResizeColumns()
+            .RowTemplate.Height = 30
+            .AllowUserToResizeRows = False
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(218, 238, 255)
+            .ColumnHeadersDefaultCellStyle.Font = New Font(.Font, FontStyle.Bold)
 
-        dataGridViewRec.RowHeadersVisible = False
-        dataGridViewRec.EnableHeadersVisualStyles = False
-        dataGridViewRec.ColumnCount = 5
+            Dim columnNames As String() = {"Part Number", "Part Type", "CG Code", "Part Description", "Qty Per Part"}
+            Dim columnWidths As Integer() = {180, 128, 160, 350, 100}
 
-        dataGridViewRec.Columns(0).Name = "Part Number"
-        dataGridViewRec.Columns(1).Name = "Part Type"
-        dataGridViewRec.Columns(2).Name = "CG Code"
-        dataGridViewRec.Columns(3).Name = "Part Description"
-        dataGridViewRec.Columns(4).Name = "Qty Per Part"
-
-        dataGridViewRec.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-        dataGridViewRec.AutoResizeColumns()
-
-        dataGridViewRec.Columns("Part Number").Width = 180
-        dataGridViewRec.Columns("Part Type").Width = 128
-        dataGridViewRec.Columns("CG Code").Width = 160
-        dataGridViewRec.Columns("Part Description").Width = 350
-        dataGridViewRec.Columns("Qty Per Part").Width = 100
-
-        dataGridViewRec.RowTemplate.Height = 30
-        dataGridViewRec.AllowUserToResizeRows = False
-
-        dataGridViewRec.RowsDefaultCellStyle.BackColor = Color.White
-        dataGridViewRec.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(218, 238, 255)
-
-        With dataGridViewRec.ColumnHeadersDefaultCellStyle
-            '.BackColor = Color.Navy
-            '.ForeColor = Color.White
-            .Font = New Font(dataGridViewRec.Font, FontStyle.Bold)
+            For i As Integer = 0 To .ColumnCount - 1
+                .Columns(i).Name = columnNames(i)
+                .Columns(i).Width = columnWidths(i)
+            Next
         End With
     End Sub
 
@@ -163,8 +151,11 @@ Public Class frmImport
         End If
         SaveMM()
         dgvImport.Rows.Clear()
-        dgvImport.Refresh()
+        Me.Hide()
+        frmMain.Focus()
         frmMain.btnMM.PerformClick()
+        MessageBox.Show("Data has been successfully saved/uploaded to the system.", "Import Part Management Info.", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Me.Close()
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click

@@ -1,16 +1,19 @@
-﻿Public Class frmStockIn
+﻿Imports Seagull.BarTender.Print
+Public Class frmStockIn
     Public SQL As New SQLControl
-    Dim oldscan As String
-    Dim oldpn As String
-    Dim _btw_path = ""
-    Dim _PrinterName = ""
+    Private oldscan As String
+    Private oldpn As String
+    Private _btw_path = ""
+    Private _PrinterName = ""
 
     Private Sub frmStockIn_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Show()
+        Cursor.Current = Cursors.WaitCursor
+        Loading.Show()
+
         lblMessageLogs.Left = (lblMessageLogs.Parent.Width \ 2) - (lblMessageLogs.Width \ 2) 'horizontal centering
         'Label1.Top = (Label1.Parent.Height \ 2) - (Label1.Height \ 2) ' Ver centering
 
-        Dim printers As Seagull.BarTender.Print.Printers = New Seagull.BarTender.Print.Printers()
+        Dim printers As Printers = New Printers()
 
         If printers.Count > 0 Then
             _PrinterName = printers.[Default].PrinterName
@@ -19,14 +22,16 @@
         _btw_path = Application.StartupPath + "\Barcode.btw"
 
         txtnew.Text = txtQty.Text - txtOut.Text
-        txtScan.Focus()
 
+        Me.Show()
+        Loading.Close()
+        txtScan.Focus()
     End Sub
 
     Private Sub GetRack()
         Dim name As String
 
-        Dim codes As String() = {"MCT", "KTXS", "ACM", "GPI", "PCBLITE"}
+        Dim codes As String() = {"MCT", "KTXS", "ACM", "GPI", "PCBLITE", "TEST"}
         name = Array.Find(codes, Function(x) txtCode.Text.Trim.Contains(x))
         If name = "PCBLITE" Then name = "PCB LITE"
         If name Is Nothing Then name = ""
@@ -284,59 +289,15 @@ onrecord:
         txtSRRemark.ReadOnly = True
     End Sub
 
-    Private Sub PrintBar(ByVal Optional isPreView As Boolean = False)
-        Using btEngine As Seagull.BarTender.Print.Engine = New Seagull.BarTender.Print.Engine(True)
-            Dim labelFormat As Seagull.BarTender.Print.LabelFormatDocument = btEngine.Documents.Open(_btw_path)
-
-            Try
-                'QR Code
-                labelFormat.SubStrings.SetSubString("pn", txtPN.Text.Trim)
-                labelFormat.SubStrings.SetSubString("cgid", txtCGID.Text.Trim)
-                labelFormat.SubStrings.SetSubString("grn", txtGRN.Text.Trim)
-                labelFormat.SubStrings.SetSubString("dc", txtDC.Text.Trim)
-                labelFormat.SubStrings.SetSubString("cgcode", txtCode.Text.Trim)
-                labelFormat.SubStrings.SetSubString("qty", txtnew.Text.Trim)
-                'Others
-            Catch ex As Exception
-                MessageBox.Show("Error in modifying content" & ex.Message, "Printing Error!")
-            End Try
-
-            If isPreView Then Return
-
-            If _PrinterName <> "" Then
-                labelFormat.PrintSetup.PrinterName = _PrinterName
-                labelFormat.Print("CG Inventory Management" & DateTime.Now, 5)
-
-                txtMsgLog.Text += "Update complete: " & txtCGID.Text & vbCrLf
-                txtMsgLog.Select(txtMsgLog.TextLength - 34, 34)
-                txtMsgLog.SelectionColor = Color.Green
-
-                txtPN.Text = ""
-                txtDC.Text = ""
-                txtGRN.Text = ""
-                txtCode.Text = ""
-                txtCGID.Text = ""
-                txtRemark.Text = ""
-                txtQty.Text = "0"
-                txtOut.Text = "0"
-                txtnew.Text = "0"
-                'cbxLoc.Items.Clear()
-                'txtEmployeeID.Text = ""
-                cbxLoc.Enabled = False
-                txtEmployeeID.ReadOnly = True
-                txtScan.Focus()
-                txtScan.Select(0, txtScan.Text.Length)
-                btnDO.Enabled = False
-                btnStockIn.Checked = True
-                btnStockIn.Enabled = True
-                txtSRRemark.ReadOnly = True
-            Else
-                MessageBox.Show("Please select a printer first", "Select Printer!")
-            End If
-        End Using
-    End Sub
-
-    Private Sub DoUpdate()
+    Private Sub DoUpdate(condition As Boolean)
+        If initEngine.bgwInitEngine.IsBusy Then
+            ' Wait for the background worker to complete before accessing the engine
+            While initEngine.bgwInitEngine.IsBusy
+                Application.DoEvents()
+            End While
+        End If
+        'Load btw
+        Dim labelFormat As LabelFormatDocument = initEngine._btEngine.Documents.Open(_btw_path)
 
         SQL.AddParam("@oldscan", oldscan)
         SQL.AddParam("@newqty", txtnew.Text.Trim)
@@ -380,10 +341,73 @@ onrecord:
 
         If SQL.HasException(True) Then Exit Sub
 
-        PrintBar()
+        If condition Then
+            ' Update the data source
+            With labelFormat.SubStrings
+                .SetSubString("pn", txtPN.Text.Trim)
+                .SetSubString("cgid", txtCGID.Text.Trim)
+                .SetSubString("grn", txtGRN.Text.Trim)
+                .SetSubString("dc", txtDC.Text.Trim)
+                .SetSubString("cgcode", txtCode.Text.Trim)
+                .SetSubString("qty", txtnew.Text.Trim)
+                ' set other SubStrings as needed
+            End With
+
+            ' Print the label(s)
+            If Not String.IsNullOrEmpty(_PrinterName) Then
+                labelFormat.PrintSetup.PrinterName = _PrinterName
+                labelFormat.Print("CGIM" & DateTime.Now, 2000)
+
+                ' Update UI and reset fields
+                txtMsgLog.AppendText("Update complete: " & txtCGID.Text & vbCrLf)
+                txtMsgLog.Select(txtMsgLog.TextLength - 34, 34)
+                txtMsgLog.SelectionColor = Color.Green
+
+                Dim fieldsToReset() As Control = {txtPN, txtDC, txtGRN, txtCode, txtCGID, txtRemark}
+                For Each field As Control In fieldsToReset
+                    field.Text = ""
+                Next
+
+                txtQty.Text = "0"
+                txtOut.Text = "0"
+                txtnew.Text = "0"
+                cbxLoc.Enabled = False
+                txtEmployeeID.ReadOnly = True
+                txtScan.Focus()
+                txtScan.SelectAll()
+                btnDO.Enabled = False
+                btnStockIn.Checked = True
+                btnStockIn.Enabled = True
+                txtSRRemark.ReadOnly = True
+            Else
+                MessageBox.Show("Please select a printer first", "Select Printer")
+            End If
+        Else
+            ' Update UI and reset fields
+            txtMsgLog.AppendText("Update complete: " & txtCGID.Text & vbCrLf)
+            txtMsgLog.Select(txtMsgLog.TextLength - 34, 34)
+            txtMsgLog.SelectionColor = Color.Green
+
+            Dim fieldsToReset() As Control = {txtPN, txtDC, txtGRN, txtCode, txtCGID, txtRemark}
+            For Each field As Control In fieldsToReset
+                field.Text = ""
+            Next
+
+            txtQty.Text = "0"
+            txtOut.Text = "0"
+            txtnew.Text = "0"
+            cbxLoc.Enabled = False
+            txtEmployeeID.ReadOnly = True
+            txtScan.Focus()
+            txtScan.SelectAll()
+            btnDO.Enabled = False
+            btnStockIn.Checked = True
+            btnStockIn.Enabled = True
+            txtSRRemark.ReadOnly = True
+        End If
     End Sub
 
-    Private Sub DoStockInUpdate()
+    Private Sub DoStockInUpdate(condition As Boolean)
         Dim strDate As DateTime
         strDate = DateTime.Parse(txtDC.Text, System.Globalization.CultureInfo.CreateSpecificCulture("en-GB").DateTimeFormat)
 
@@ -429,7 +453,7 @@ onrecord:
 
         If SQL.HasException(True) Then Exit Sub
 
-        DoUpdate()
+        DoUpdate(condition)
     End Sub
 
     Private Sub btnDO_Click(sender As Object, e As EventArgs) Handles btnDO.Click
@@ -445,35 +469,44 @@ onrecord:
             SQL.AddParam("@uid", txtEmployeeID.Text)
             SQL.ExecQuery("SELECT TOP 1 * FROM Users Where UserID = @uid")
 
-            If SQL.RecordCount > 0 Then
-                If btnDO.Text = "Stock In" Then
-                    DOStockIn()
-                Else
-                    If txtnew.Text = 0 Then
-                        MessageBox.Show("The new quantity is 0!? What exactly do you mean by 'update it'?",
-                                          "Error!",
-                                           MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-                    Else
-                        SQL.AddParam("@printcode", oldscan)
-                        SQL.ExecQuery("SELECT TOP 1 * FROM PartOut WHERE PrintCode = @printcode")
-
-                        If SQL.RecordCount > 0 Then
-                            DoStockInUpdate()
-                        Else
-                            MessageBox.Show("This part has never been stockout before!?" & vbCrLf &
-                                                "Please begin with a stockin.", "Part Need to Stockin!",
-                                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-
-                            btnStockIn.Checked = True
-                            btnStockIn.Enabled = True
-                        End If
-                    End If
-                End If
-            Else
+            If SQL.RecordCount = 0 Then
                 MessageBox.Show("Employee ID not found.", "Employee ID!")
                 txtEmployeeID.Focus()
-                txtEmployeeID.Select(0, txtEmployeeID.Text.Length)
+                txtEmployeeID.SelectAll()
                 Exit Sub
+            End If
+
+            If btnDO.Text = "Stock In" Then
+                DOStockIn()
+
+            ElseIf txtnew.Text = 0 Then
+                MessageBox.Show("The new quantity is 0!? What exactly do you mean by 'update it'?", "Error!",
+                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+
+            ElseIf txtnew.Text = txtQty.Text Then
+                SQL.AddParam("@printcode", oldscan)
+                SQL.ExecQuery("SELECT TOP 1 * FROM PartOut WHERE PrintCode = @printcode")
+
+                If SQL.RecordCount > 0 Then
+                    DoStockInUpdate(False)
+                Else
+                    MessageBox.Show("This part has never been stockout before!?" & vbCrLf &
+                        "Please begin with a stockin.", "Part Need to Stockin!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    btnStockIn.Checked = True
+                    btnStockIn.Enabled = True
+                End If
+            Else
+                SQL.AddParam("@printcode", oldscan)
+                SQL.ExecQuery("SELECT TOP 1 * FROM PartOut WHERE PrintCode = @printcode")
+
+                If SQL.RecordCount > 0 Then
+                    DoStockInUpdate(True)
+                Else
+                    MessageBox.Show("This part has never been stockout before!?" & vbCrLf &
+                        "Please begin with a stockin.", "Part Need to Stockin!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    btnStockIn.Checked = True
+                    btnStockIn.Enabled = True
+                End If
             End If
         End If
     End Sub

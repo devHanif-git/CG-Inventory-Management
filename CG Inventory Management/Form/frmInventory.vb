@@ -1,159 +1,126 @@
 ﻿Public Class frmInventory
     Public SQL As New SQLControl
+    Public hwid As String = frmMain.hwid
+
+    Private searchMode As Boolean
+    Private searchType As String = ""
+    Private searchText As String = ""
+
     Private Sub frmInventory_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Show()
+        Loading.Show()
 
-        'HWID
-        Dim hw As New clsComputerInfo
-
-        Dim hdd As String
-        Dim cpu As String
-        Dim mb As String
-        Dim mac As String
-
-        cpu = hw.GetProcessorId()
-        hdd = hw.GetVolumeSerial("C")
-        mb = hw.GetMotherBoardID()
-        mac = hw.GetMACAddress()
-
-        'MsgBox(cpu & "   " & hdd & "   " & mb & "   " & mac)
-
-        Dim hwid As String = Strings.UCase(hw.getMD5Hash(cpu & hdd & mb & mac))
-
-        ' MessageBox.Show(Strings.UCase(hwid))
-
-        'TextBox1.Text = hwid
-        'MsgBox(hwid)
-
-        'END HWID
-
-        If hwid = "7C654D04A9EE2967620C99DD5DD1A0F1" Or hwid = "05EA3FF0C220883F0020347582CCD983" Then
-            Guna2ContextMenuStrip1.Enabled = True
-        Else
-            Guna2ContextMenuStrip1.Enabled = False
-        End If
+        Guna2ContextMenuStrip1.Enabled = hwid = "7C654D04A9EE2967620C99DD5DD1A0F1" Or hwid = "05EA3FF0C220883F0020347582CCD983"
 
         dgvInventory.DoubleBuffered(True)
         frmInventoryPart.dgvInventory.DoubleBuffered(True)
         SetupDGV()
+        SetupInventoryPart()
+
         LoadDatatoDGV()
 
-        SetupInventoryPart()
         cbxSearch.SelectedIndex = 0
+        Loading.Close()
+        Me.Show()
     End Sub
 
     Private Sub SetupDGV()
-        Dim dataGridViewRec As DataGridView = dgvInventory
+        With dgvInventory
+            .RowHeadersVisible = False
+            .EnableHeadersVisualStyles = False
+            .ColumnCount = 6
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            .AutoResizeColumns()
+            .RowTemplate.Height = 30
+            .AllowUserToResizeRows = False
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(218, 238, 255)
+            .ColumnHeadersDefaultCellStyle.Font = New Font(.Font, FontStyle.Bold)
 
-        dataGridViewRec.RowHeadersVisible = False
-        dataGridViewRec.EnableHeadersVisualStyles = False
-        dataGridViewRec.ColumnCount = 6
+            Dim columnNames() As String = {"Part Number", "Part Type", "CG Code", "Part Description", "NoC", "Total Quantity"}
+            Dim columnWidths() As Integer = {180, 128, 160, 450, 40, 140}
 
-        dataGridViewRec.Columns(0).Name = "Part Number"
-        dataGridViewRec.Columns(1).Name = "Part Type"
-        dataGridViewRec.Columns(2).Name = "CG Code"
-        dataGridViewRec.Columns(3).Name = "Part Description"
-        dataGridViewRec.Columns(4).Name = "NoC"
-        dataGridViewRec.Columns(5).Name = "Total Quantity"
+            For i As Integer = 0 To columnNames.Length - 1
+                .Columns(i).Name = columnNames(i)
+                .Columns(i).Width = columnWidths(i)
+            Next
 
-        dataGridViewRec.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-        dataGridViewRec.AutoResizeColumns()
-
-        dataGridViewRec.Columns("Part Number").Width = 180
-        dataGridViewRec.Columns("Part Type").Width = 128
-        dataGridViewRec.Columns("CG Code").Width = 160
-        dataGridViewRec.Columns("Part Description").Width = 450
-        dataGridViewRec.Columns("NoC").Width = 40
-        dataGridViewRec.Columns("Total Quantity").Width = 140
-
-        dataGridViewRec.RowTemplate.Height = 30
-        dataGridViewRec.AllowUserToResizeRows = False
-
-        dataGridViewRec.RowsDefaultCellStyle.BackColor = Color.White
-        dataGridViewRec.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(218, 238, 255)
-
-        With dataGridViewRec.ColumnHeadersDefaultCellStyle
-            '.BackColor = Color.Navy
-            '.ForeColor = Color.White
-            .Font = New Font(dataGridViewRec.Font, FontStyle.Bold)
         End With
     End Sub
 
     Private Sub SetupInventoryPart()
+        With frmInventoryPart.dgvInventory
+            .RowHeadersVisible = False
+            .EnableHeadersVisualStyles = False
+            .ColumnCount = 11
+            .RowTemplate.Height = 35
+            .AllowUserToResizeRows = False
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            .AutoResizeColumns()
+            .RowsDefaultCellStyle.BackColor = Color.White
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(218, 238, 255)
+            .ColumnHeadersDefaultCellStyle.Font = New Font(.Font, FontStyle.Bold)
 
-        Dim dataGridViewRec As DataGridView = frmInventoryPart.dgvInventory
+            Dim columnNames As String() = {"No.", "CGID", "Part Number", "Location", "Date Code", "Quantity", "GRN No.", "Update Time", "Updater", "State", "Remark"}
 
-        dataGridViewRec.RowHeadersVisible = False
-        dataGridViewRec.EnableHeadersVisualStyles = False
-        dataGridViewRec.ColumnCount = 11
+            For i As Integer = 0 To columnNames.Length - 1
+                .Columns(i).Name = columnNames(i)
+            Next
 
-        dataGridViewRec.Columns(0).Name = "No."
-        dataGridViewRec.Columns(1).Name = "CGID"
-        dataGridViewRec.Columns(2).Name = "Part Number"
-        dataGridViewRec.Columns(3).Name = "Location"
-        dataGridViewRec.Columns(4).Name = "Date Code"
-        dataGridViewRec.Columns(5).Name = "Quantity"
-        dataGridViewRec.Columns(6).Name = "GRN No."
-        dataGridViewRec.Columns(7).Name = "Update Time"
-        dataGridViewRec.Columns(8).Name = "Updater"
-        dataGridViewRec.Columns(9).Name = "State"
-        dataGridViewRec.Columns(10).Name = "Remark"
+            .Columns("Date Code").DefaultCellStyle.Format = "dd-MM-yyyy"
 
-        dataGridViewRec.RowTemplate.Height = 35
-        dataGridViewRec.AllowUserToResizeRows = False
-
-        dataGridViewRec.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-        dataGridViewRec.AutoResizeColumns()
-
-        dataGridViewRec.Columns("No.").Width = 40
-        dataGridViewRec.Columns("CGID").Width = 150
-        dataGridViewRec.Columns("Part Number").Width = 180
-        dataGridViewRec.Columns("Location").Width = 78
-        dataGridViewRec.Columns("Date Code").Width = 85
-        dataGridViewRec.Columns("Quantity").Width = 75
-        dataGridViewRec.Columns("Update Time").Width = 100
-        dataGridViewRec.Columns("Updater").Width = 75
-        dataGridViewRec.Columns("State").Width = 100
-
-        dataGridViewRec.Columns("Date Code").DefaultCellStyle.Format = "dd-MM-yyyy"
-
-        dataGridViewRec.RowsDefaultCellStyle.BackColor = Color.White
-        dataGridViewRec.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(218, 238, 255)
-
-        With dataGridViewRec.ColumnHeadersDefaultCellStyle
-            '.BackColor = Color.Navy
-            '.ForeColor = Color.White
-            .Font = New Font(dataGridViewRec.Font, FontStyle.Bold)
+            .Columns("No.").Width = 40
+            .Columns("CGID").Width = 150
+            .Columns("Part Number").Width = 180
+            .Columns("Location").Width = 78
+            .Columns("Date Code").Width = 85
+            .Columns("Quantity").Width = 75
+            .Columns("Update Time").Width = 100
+            .Columns("Updater").Width = 75
+            .Columns("State").Width = 100
         End With
     End Sub
 
     Private Sub LoadDatatoDGV()
-        Try
-            dgvInventory.Rows.Clear()
+        dgvInventory.Rows.Clear()
 
+        If searchMode Then
+            SQL.AddParam("@findtxt", "%" & searchText & "%")
             SQL.ExecQuery("SELECT PartManagement.PartNumber, PartManagement.PartType," _
-                & "PartManagement.CGCode, PartManagement.PN_Desc, COUNT(Inventory.PartNumber) AS NoC," _
-                & "SUM(Inventory.Qty) AS 'Total Quantity'" _
-                & "FROM Inventory JOIN PartManagement " _
-                & "ON Inventory.PartNumber=PartManagement.PartNumber " _
-                & "GROUP BY PartManagement.PartNumber, PartManagement.PartType, " _
-                & "PartManagement.CGCode, PartManagement.PN_Desc;")
+                        & "PartManagement.CGCode, PartManagement.PN_Desc, COUNT(Inventory.PartNumber) AS NoC," _
+                        & "SUM(Inventory.Qty) AS 'Total Quantity'" _
+                        & "FROM Inventory JOIN PartManagement " _
+                        & "ON Inventory.PartNumber=PartManagement.PartNumber " _
+                        & "WHERE " & searchType & " LIKE @findtxt " _
+                        & "GROUP BY PartManagement.PartNumber, PartManagement.PartType, " _
+                        & "PartManagement.CGCode, PartManagement.PN_Desc;")
 
-            If SQL.HasException(True) Then Exit Sub
+        Else
+            SQL.ExecQuery("SELECT PartManagement.PartNumber, PartManagement.PartType," _
+                        & "PartManagement.CGCode, PartManagement.PN_Desc, COUNT(Inventory.PartNumber) AS NoC," _
+                        & "SUM(Inventory.Qty) AS 'Total Quantity'" _
+                        & "FROM Inventory JOIN PartManagement " _
+                        & "ON Inventory.PartNumber=PartManagement.PartNumber " _
+                        & "GROUP BY PartManagement.PartNumber, PartManagement.PartType, " _
+                        & "PartManagement.CGCode, PartManagement.PN_Desc;")
+        End If
 
-            For i As Integer = 1 To SQL.DBDT.Rows.Count
+        If SQL.HasException(True) Then Exit Sub
 
-                dgvInventory.Rows.Add(New Object() {SQL.DBDT.Rows(i - 1)("PartNumber"), SQL.DBDT.Rows(i - 1)("PartType"),
-                                      SQL.DBDT.Rows(i - 1)("CGCode"), SQL.DBDT.Rows(i - 1)("PN_Desc"),
-                                      SQL.DBDT.Rows(i - 1)("NoC"), SQL.DBDT.Rows(i - 1)("Total Quantity")})
-            Next
-        Catch ex As Exception
-            MsgBox(ex.Message)
-        End Try
+        For i As Integer = 1 To SQL.DBDT.Rows.Count
+
+            dgvInventory.Rows.Add(New Object() {SQL.DBDT.Rows(i - 1)("PartNumber"), SQL.DBDT.Rows(i - 1)("PartType"),
+                                  SQL.DBDT.Rows(i - 1)("CGCode"), SQL.DBDT.Rows(i - 1)("PN_Desc"),
+                                  SQL.DBDT.Rows(i - 1)("NoC"), SQL.DBDT.Rows(i - 1)("Total Quantity")})
+        Next
+    End Sub
+
+    Private Sub dgvInventory_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvInventory.CellClick
+        Label2.Text = dgvInventory.CurrentCell.Value
+        frmInventoryPart.Text = "Inventory for Part Number: " + dgvInventory.CurrentRow.Cells(0).Value.ToString
     End Sub
 
     Private Sub dgvInventory_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvInventory.CellDoubleClick
-        frmInventoryPart.Text = "Inventory for Part Number: " + dgvInventory.CurrentRow.Cells(0).Value.ToString
+        'frmInventoryPart.Text = "Inventory for Part Number: " + dgvInventory.CurrentRow.Cells(0).Value.ToString
 
         frmInventoryPart.dgvInventory.Refresh()
         frmMain.Hide()
@@ -199,45 +166,19 @@
             'no beep
             e.Handled = True
             Try
-                Dim filtertext As String = ""
-                If cbxSearch.SelectedIndex = 0 Then
-                    filtertext = "PartManagement.PartNumber"
-                ElseIf cbxSearch.SelectedIndex = 1 Then
-                    filtertext = "PartManagement.PartType"
-                ElseIf cbxSearch.SelectedIndex = 2 Then
-                    filtertext = "PartManagement.CGCode"
-                ElseIf cbxSearch.SelectedIndex = 3 Then
-                    filtertext = "PartManagement.PN_Desc"
-                End If
-
                 If txtSearch.Text = "" Then
-                    LoadDatatoDGV()
+                    searchMode = False
                 Else
-                    SQL.AddParam("@filter", "%" & txtSearch.Text.Trim.ToUpper & "%")
+                    searchMode = True
 
-                    SQL.ExecQuery("SELECT PartManagement.PartNumber, PartManagement.PartType," _
-                                & "PartManagement.CGCode, PartManagement.PN_Desc, COUNT(Inventory.PartNumber) AS NoC," _
-                                & "SUM(Inventory.Qty) AS 'Total Quantity'" _
-                                & "FROM Inventory JOIN PartManagement " _
-                                & "ON Inventory.PartNumber=PartManagement.PartNumber " _
-                                & "WHERE " & filtertext & " LIKE @filter " _
-                                & "GROUP BY PartManagement.PartNumber, PartManagement.PartType, " _
-                                & "PartManagement.CGCode, PartManagement.PN_Desc;")
+                    Dim dataTypes As String() = {"PartManagement.PartNumber", "PartManagement.PartType",
+                                                "PartManagement.CGCode", "PartManagement.PN_Desc"}
 
-                    If SQL.HasException(True) Then Exit Sub
+                    searchType = dataTypes(cbxSearch.SelectedIndex)
 
-                    If SQL.RecordCount > 0 Then
-                        dgvInventory.Rows.Clear()
-                        For i As Integer = 1 To SQL.DBDT.Rows.Count
-                            dgvInventory.Rows.Add(New Object() {SQL.DBDT.Rows(i - 1)("PartNumber"), SQL.DBDT.Rows(i - 1)("PartType"),
-                                      SQL.DBDT.Rows(i - 1)("CGCode"), SQL.DBDT.Rows(i - 1)("PN_Desc"),
-                                      SQL.DBDT.Rows(i - 1)("NoC"), SQL.DBDT.Rows(i - 1)("Total Quantity")})
-                        Next
-                    Else
-                        dgvInventory.Rows.Clear()
-                    End If
+                    searchText = txtSearch.Text.Trim.ToUpper
                 End If
-
+                LoadDatatoDGV()
             Catch ex As Exception
                 Exit Sub
             End Try
@@ -245,9 +186,6 @@
     End Sub
 
     Private Sub DeletePartNumberToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DeletePartNumberToolStripMenuItem.Click
-        'If MessageBox.Show("Confirm to print label carton" & vbCrLf & "with below part number information?" & vbCrLf & vbCrLf & "Part Number: " & dgvInventory.SelectedRows(0).Cells("Part Number").Value & vbCrLf & "CG Code: " & dgvInventory.SelectedRows(0).Cells("CG Code").Value & vbCrLf & "Total Quantity: " & dgvInventory.SelectedRows(0).Cells("Total Quantity").Value, "Print Label Carton", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) = DialogResult.Yes Then
-        '    PrintBar()
-        'End If
 
         PrintCartonLabel.lblpn.Text = dgvInventory.SelectedRows(0).Cells("Part Number").Value
         PrintCartonLabel.lblcgcode.Text = dgvInventory.SelectedRows(0).Cells("CG Code").Value

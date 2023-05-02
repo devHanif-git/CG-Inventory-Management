@@ -3,7 +3,8 @@
 
 Public Class SQLControl
     'Private DBCon As New MySqlConnection("Server=192.168.1.99;port=3306;Database=seastone_wms;Uid=mysql;Pwd=mysqlsyt;")
-    Private DBCon As New SqlConnection("Server=DESKTOP-FEPG6KQ;Database=DBTest;User=admin;Pwd=Asd123@sd;")
+    'Private DBCon As New SqlConnection("Server=192.168.1.32\CG_INVENTORY;Database=CGInventory;User=admin;Pwd=eLuQr3GghsMgqGj;")
+    Private DBCon As New SqlConnection("Data Source=192.168.1.32\CG_INVENTORY,1433;Initial Catalog=CGInventory;User ID=admin;password=eLuQr3GghsMgqGj;Connection Timeout=30;")
     Private DBCmd As SqlCommand
 
     ' DB DATA

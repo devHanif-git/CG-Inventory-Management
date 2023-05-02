@@ -3,9 +3,11 @@
     Dim oldscan As String
     Dim valid As Boolean
     Private Sub frmStockOut_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Show()
+        Loading.Show()
         lblMessageLogs.Left = (lblMessageLogs.Parent.Width \ 2) - (lblMessageLogs.Width \ 2) 'horizontal centering
         'Label1.Top = (Label1.Parent.Height \ 2) - (Label1.Height \ 2) ' Ver centering
+        Loading.Close()
+        Me.Show()
         txtScan.Focus()
     End Sub
 
@@ -77,7 +79,6 @@
 
                 If SQL.RecordCount > 0 Then
                     txtScan.Text = ""
-
                     Dim strDate As DateTime
                     strDate = DateTime.Parse(SQL.DBDT.Rows(0)("DateCode"), System.Globalization.CultureInfo.CreateSpecificCulture("en-GB").DateTimeFormat)
                     Dim formatInfo As New System.Globalization.DateTimeFormatInfo()
@@ -92,6 +93,7 @@
                     txtLoc.Text = SQL.DBDT.Rows(0)("Rack")
                     txtRemark.Text = SQL.DBDT.Rows(0)("Remark")
                     txtQty.Text = SQL.DBDT.Rows(0)("Qty")
+
 
                     txtMTF.ReadOnly = False
                     txtEmployeeID.ReadOnly = False
