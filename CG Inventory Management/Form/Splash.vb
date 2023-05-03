@@ -1,16 +1,12 @@
 ﻿Public Class Splash
+    Private hwid As String
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         ProgressBar1.Increment(1)
         Cursor.Current = Cursors.WaitCursor
 
-        'Init BarTender Engine
-        If ProgressBar1.Value = 1 Then
-            initEngine.Show()
-        End If
-
         'GET HWID
-        If ProgressBar1.Value = 50 Then
+        If ProgressBar1.Value = 20 Then
             Timer1.Enabled = False
             Dim hw As New clsComputerInfo
 
@@ -24,11 +20,16 @@
             mb = hw.GetMotherBoardID()
             mac = hw.GetMACAddress()
 
-            Dim hwid As String = Strings.UCase(hw.getMD5Hash(cpu & hdd & mb & mac))
+            hwid = Strings.UCase(hw.getMD5Hash(cpu & hdd & mb & mac))
 
             frmMain.hwid = hwid
 
             Timer1.Enabled = True
+        End If
+
+        'Init BarTender Engine
+        If ProgressBar1.Value = 50 And hwid = "7C654D04A9EE2967620C99DD5DD1A0F1" Or hwid = "05EA3FF0C220883F0020347582CCD983" Then
+            initEngine.Show()
         End If
 
         'Finishing
