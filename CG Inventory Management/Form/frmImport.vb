@@ -49,7 +49,9 @@ Public Class frmImport
             With OpenFileDialog1
                 .Filter = "Excel Office| *.xls;*.xlsx"
                 .InitialDirectory = Application.StartupPath
-                .ShowDialog()
+                If .ShowDialog() = DialogResult.Cancel Then
+                    Return ' Exit the function if the user presses cancel
+                End If
                 strFileName = .FileName
             End With
 

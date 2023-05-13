@@ -746,12 +746,40 @@
             uid = r("UserID")
         Next
 
-        SQL.AddParam("@uid", uid)
-        SQL.AddParam("@rack", lbxRack.Text)
-        SQL.AddParam("@newrack", txtRackName.Text)
+        'ALTER TABLE Inventory DROP CONSTRAINT FK FOR RACK
+        SQL.ExecQuery("ALTER TABLE Inventory DROP CONSTRAINT FK_InventoryRack;")
+        If SQL.HasException(True) Then Exit Sub
 
-        SQL.ExecQuery("UPDATE Rack SET RackName = @newrack, UpdateTime = GETDATE(), Updater = @uid WHERE RackName = @rack")
+        SQL.ExecQuery("ALTER TABLE PartOut DROP CONSTRAINT FK_PartOutRack;")
+        If SQL.HasException(True) Then Exit Sub
 
+        'UPDATE HERE
+        Dim tables As String() = {"Inventory", "PartLog", "PartOut", "Rack"}
+
+        For Each table In tables
+            SQL.AddParam("@uid", uid)
+            SQL.AddParam("@newRack", txtRackName.Text)
+            SQL.AddParam("@oldRack", lbxRack.Text)
+
+            If table = "Rack" Then
+                SQL.ExecQuery("UPDATE " & table & " SET RackName = @newRack, UpdateTime = GETDATE(), Updater = @uid WHERE RackName = @oldRack")
+            Else
+                SQL.ExecQuery("UPDATE " & table & " SET Rack = @newRack WHERE Rack = @oldRack")
+            End If
+            If SQL.HasException(True) Then Exit Sub
+        Next
+
+
+        If SQL.HasException(True) Then Exit Sub
+
+        SQL.ExecQuery("ALTER TABLE Inventory " _
+                    & "ADD Constraint FK_InventoryRack " _
+                    & "FOREIGN KEY(Rack) REFERENCES Rack(RackName);")
+        If SQL.HasException(True) Then Exit Sub
+
+        SQL.ExecQuery("ALTER TABLE PartOut " _
+                    & "ADD Constraint FK_PartOutRack " _
+                    & "FOREIGN KEY(Rack) REFERENCES Rack(RackName);")
         If SQL.HasException(True) Then Exit Sub
 
         MessageBox.Show("Rack Details Has Been Updated.", "Administrator")

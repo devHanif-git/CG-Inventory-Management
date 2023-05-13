@@ -31,7 +31,7 @@ Public Class frmStockIn
     Private Sub GetRack()
         Dim name As String
 
-        Dim codes As String() = {"MCT", "KTXS", "ACM", "GPI", "PCBLITE", "TEST"}
+        Dim codes As String() = {"UMCG", "KTXS", "ACM", "GPI", "PCBLITE", "TEST"}
         name = Array.Find(codes, Function(x) txtCode.Text.Trim.Contains(x))
         If name = "PCBLITE" Then name = "PCB LITE"
         If name Is Nothing Then name = ""
