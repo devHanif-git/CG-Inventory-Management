@@ -28,7 +28,7 @@
         End If
 
         'Init BarTender Engine
-        If ProgressBar1.Value = 50 And hwid = "7C654D04A9EE2967620C99DD5DD1A0F1" Or hwid = "05EA3FF0C220883F0020347582CCD983" Then
+        If ProgressBar1.Value = 50 And hwid = "7C654D04A9EE2967620C99DD5DD1A0F1" Then
             initEngine.Show()
         End If
 

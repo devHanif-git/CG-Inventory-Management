@@ -172,6 +172,8 @@ onrecord:
                     btnDO.Enabled = True
                     txtSRRemark.ReadOnly = False
 
+                    cbxLoc.Items.Clear()
+
                     If cbxLoc.Items.Count < 1 Then
                         GetRack()
                     End If
