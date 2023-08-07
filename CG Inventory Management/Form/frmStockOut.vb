@@ -276,33 +276,44 @@
         ' Get the value of the textbox
         Dim value As String = txtMTF.Text
 
-        ' Check if the textbox has reached the maximum length of the pattern
-        If txtMTF.Text.Length >= 12 And Not e.KeyCode = Keys.Back Then
-            ' If the textbox has reached the maximum length, prevent any further input
+        ' Check if the backspace key was pressed
+        If e.KeyCode = Keys.Back Then
+            ' If the backspace key was pressed, handle it by letting the default behavior occur
+            Return
+        End If
+
+        ' Check if any text is selected
+        If txtMTF.SelectionLength > 0 Then
+            ' If text is selected, replace it with the new character(s)
+            Dim start As Integer = txtMTF.SelectionStart
+            Dim length As Integer = txtMTF.SelectionLength
+
+            Dim newText As String = value.Remove(start, length)
+            newText = newText.Insert(start, ChrW(e.KeyValue)) ' Use ChrW to convert the key value to a character
+
+            ' Update the text and maintain cursor position
+            txtMTF.Text = newText
+            txtMTF.SelectionStart = start + 1
             e.SuppressKeyPress = True
             Return
         End If
 
-        ' Check if the backspace key was pressed
-        If e.KeyCode = Keys.Back Then
-            ' If the backspace key was pressed, skip the code that adds the "/" character
+        ' Check if the textbox has reached the maximum length of the pattern
+        If txtMTF.Text.Length >= 12 Then
+            ' If the textbox has reached the maximum length and no text is selected, prevent any further input
+            e.SuppressKeyPress = True
             Return
         End If
 
         ' Check if the third character is not a "/"
         If value.Length = 3 AndAlso value(2) <> "/" Then
-
-            ' If it is not a "/" , add one after the third character
+            ' If it is not a "/", add one after the third character
             txtMTF.Text = value.Substring(0, 3) & "/" & value.Substring(3)
-
-            ' Move the cursor to the position after the "/" character
             txtMTF.SelectionStart = 4
         End If
 
         If value.Length = 7 AndAlso value(6) <> "/" Then
-
             txtMTF.Text = value.Substring(0, 7) & "/" & value.Substring(7)
-
             txtMTF.SelectionStart = 8
         End If
     End Sub

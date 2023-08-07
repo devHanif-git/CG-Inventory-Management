@@ -103,7 +103,7 @@ Public Class frmStockIn
                     End If
                 End If
 
-                oldscan = txtScan.Text.Trim
+
 
                 SQL.AddParam("@printcode", oldscan)
                 SQL.ExecQuery("SELECT TOP 1 * FROM PartOut WHERE PrintCode = @printcode")
@@ -119,6 +119,8 @@ Public Class frmStockIn
                 SQL.ExecQuery("SELECT TOP 1 * FROM Inventory WHERE CGID = @cgid")
 
                 If SQL.RecordCount > 0 Then
+                    oldscan = txtScan.Text.Trim
+
 onrecord:
                     MessageBox.Show("This part is still on the rack!" & vbCrLf &
                                             "Please begin with a stockout.", "Part Need to Stockout!",
@@ -151,6 +153,7 @@ onrecord:
                 If SQL.HasException(True) Then Exit Sub
 
                 If SQL.RecordCount > 0 Then
+                    oldscan = txtScan.Text.Trim
                     txtScan.Text = ""
 
                     Dim strDate As DateTime
@@ -541,11 +544,7 @@ onrecord:
             'no beep
             e.Handled = True
             Try
-                If txtnew.Enabled = False Then
-                    txtOut.Focus()
-                Else
-                    btnDO.PerformClick()
-                End If
+                txtOut.Focus()
             Catch ex As Exception
                 Exit Sub
             End Try

@@ -623,34 +623,45 @@ Public Class frmIncoming
         ' Get the value of the textbox
         Dim value As String = txtGRN.Text
 
-        ' Check if the textbox has reached the maximum length of the pattern
-        If txtGRN.Text.Length >= 12 And Not e.KeyCode = Keys.Back And Not e.KeyCode = Keys.Enter Then
-            ' If the textbox has reached the maximum length, prevent any further input
+        ' Check if the backspace key was pressed
+        If e.KeyCode = Keys.Back Then
+            ' If the backspace key was pressed, handle it by letting the default behavior occur
+            Return
+        End If
+
+        ' Check if any text is selected
+        If txtGRN.SelectionLength > 0 Then
+            ' If text is selected, replace it with the new character(s)
+            Dim start As Integer = txtGRN.SelectionStart
+            Dim length As Integer = txtGRN.SelectionLength
+
+            Dim newText As String = value.Remove(start, length)
+            newText = newText.Insert(start, ChrW(e.KeyValue)) ' Use ChrW to convert the key value to a character
+
+            ' Update the text and maintain cursor position
+            txtGRN.Text = newText
+            txtGRN.SelectionStart = start + 1
             e.SuppressKeyPress = True
             Return
         End If
 
-        ' Check if the backspace key was pressed
-        If e.KeyCode = Keys.Back Then
-            ' If the backspace key was pressed, skip the code that adds the "/" character
+        ' Check if the textbox has reached the maximum length of the pattern
+        If txtGRN.Text.Length >= 10 Then
+            ' If the textbox has reached the maximum length and no text is selected, prevent any further input
+            e.SuppressKeyPress = True
             Return
         End If
 
         ' Check if the third character is not a "/"
-        If value.Length = 3 AndAlso value(2) <> "/" Then
-
-            ' If it is not a "/" , add one after the third character
-            txtGRN.Text = value.Substring(0, 3) & "/" & value.Substring(3)
-
-            ' Move the cursor to the position after the "/" character
-            txtGRN.SelectionStart = 4
+        If value.Length = 2 AndAlso value(1) <> "/" Then
+            ' If it is not a "/", add one after the third character
+            txtGRN.Text = value.Substring(0, 2) & "/" & value.Substring(2)
+            txtGRN.SelectionStart = 3
         End If
 
-        If value.Length = 7 AndAlso value(6) <> "/" Then
-
-            txtGRN.Text = value.Substring(0, 7) & "/" & value.Substring(7)
-
-            txtGRN.SelectionStart = 8
+        If value.Length = 5 AndAlso value(4) <> "/" Then
+            txtGRN.Text = value.Substring(0, 5) & "/" & value.Substring(5)
+            txtGRN.SelectionStart = 6
         End If
     End Sub
 
@@ -658,33 +669,44 @@ Public Class frmIncoming
         ' Get the value of the textbox
         Dim value As String = txtDC.Text
 
-        ' Check if the textbox has reached the maximum length of the pattern
-        If txtDC.Text.Length >= 10 And Not e.KeyCode = Keys.Back Then
-            ' If the textbox has reached the maximum length, prevent any further input
+        ' Check if the backspace key was pressed
+        If e.KeyCode = Keys.Back Then
+            ' If the backspace key was pressed, handle it by letting the default behavior occur
+            Return
+        End If
+
+        ' Check if any text is selected
+        If txtDC.SelectionLength > 0 Then
+            ' If text is selected, replace it with the new character(s)
+            Dim start As Integer = txtDC.SelectionStart
+            Dim length As Integer = txtDC.SelectionLength
+
+            Dim newText As String = value.Remove(start, length)
+            newText = newText.Insert(start, ChrW(e.KeyValue)) ' Use ChrW to convert the key value to a character
+
+            ' Update the text and maintain cursor position
+            txtDC.Text = newText
+            txtDC.SelectionStart = start + 1
             e.SuppressKeyPress = True
             Return
         End If
 
-        ' Check if the backspace key was pressed
-        If e.KeyCode = Keys.Back Then
-            ' If the backspace key was pressed, skip the code that adds the "/" character
+        ' Check if the textbox has reached the maximum length of the pattern
+        If txtDC.Text.Length >= 10 Then
+            ' If the textbox has reached the maximum length and no text is selected, prevent any further input
+            e.SuppressKeyPress = True
             Return
         End If
 
         ' Check if the third character is not a "/"
         If value.Length = 2 AndAlso value(1) <> "/" Then
-
-            ' If it is not a "/" , add one after the third character
+            ' If it is not a "/", add one after the third character
             txtDC.Text = value.Substring(0, 2) & "/" & value.Substring(2)
-
-            ' Move the cursor to the position after the "/" character
             txtDC.SelectionStart = 3
         End If
 
         If value.Length = 5 AndAlso value(4) <> "/" Then
-
             txtDC.Text = value.Substring(0, 5) & "/" & value.Substring(5)
-
             txtDC.SelectionStart = 6
         End If
     End Sub

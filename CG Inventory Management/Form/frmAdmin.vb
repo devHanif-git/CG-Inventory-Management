@@ -969,35 +969,39 @@
     End Sub
 
     Private Sub btncgidConfirm_Click(sender As Object, e As EventArgs) Handles btncgidConfirm.Click
-        If txtCGID.Text.StartsWith("CGID-") Then
-            Dim result As DialogResult = MessageBox.Show("Are you sure you want to delete everything related to this CGID?" + vbCrLf +
-                                                         vbCrLf +
-                                                         "CGID Number: " & txtCGID.Text.Trim, "Confirmation", MessageBoxButtons.YesNo)
-            If result = DialogResult.Yes Then
-                'check for data if valid or not
-                SQL.AddParam("@cgid", txtCGID.Text.Trim)
-                SQL.ExecQuery("SELECT TOP 1 * FROM PartLog WHERE CGID = @cgid")
+        Try
+            If txtCGID.Text.StartsWith("CGID-") Then
+                Dim result As DialogResult = MessageBox.Show("Are you sure you want to delete everything related to this CGID?" + vbCrLf +
+                                                             vbCrLf +
+                                                             "CGID Number: " & txtCGID.Text.Trim, "Confirmation", MessageBoxButtons.YesNo)
+                If result = DialogResult.Yes Then
+                    'check for data if valid or not
+                    SQL.AddParam("@cgid", txtCGID.Text.Trim)
+                    SQL.ExecQuery("SELECT TOP 1 * FROM PartLog WHERE CGID = @cgid")
 
-                If SQL.RecordCount > 0 Then
-                    SQL.AddParam("@cgid", txtCGID.Text.Trim)
-                    SQL.ExecQuery("DELETE FROM Inventory WHERE CGID = @cgid")
-                    SQL.AddParam("@cgid", txtCGID.Text.Trim)
-                    SQL.ExecQuery("DELETE FROM PartLog WHERE CGID = @cgid")
-                    SQL.AddParam("@cgid", txtCGID.Text.Trim)
-                    SQL.ExecQuery("DELETE FROM PartOut WHERE CGID = @cgid")
-                    SQL.AddParam("@cgid", txtCGID.Text.Trim)
-                    SQL.ExecQuery("DELETE FROM PrintedCode WHERE CGID = @cgid")
+                    If SQL.RecordCount > 0 Then
+                        SQL.AddParam("@cgid", txtCGID.Text.Trim)
+                        SQL.ExecQuery("DELETE FROM Inventory WHERE CGID = @cgid")
+                        SQL.AddParam("@cgid", txtCGID.Text.Trim)
+                        SQL.ExecQuery("DELETE FROM PartLog WHERE CGID = @cgid")
+                        SQL.AddParam("@cgid", txtCGID.Text.Trim)
+                        SQL.ExecQuery("DELETE FROM PartOut WHERE CGID = @cgid")
+                        SQL.AddParam("@cgid", txtCGID.Text.Trim)
+                        SQL.ExecQuery("DELETE FROM PrintedCode WHERE CGID = @cgid")
 
-                    If SQL.HasException(True) Then Exit Sub
-                    MessageBox.Show("Delete Completed!.", "Completed!.")
-                    txtCGID.Text = ""
-                    txtCGID.Focus()
+                        If SQL.HasException(True) Then Exit Sub
+                        MessageBox.Show("Delete Completed!.", "Completed!.")
+                        txtCGID.Text = ""
+                        txtCGID.Focus()
+                    End If
                 End If
+            Else
+                MessageBox.Show("The CGID Number is invalid!.", "Invalid!")
+                txtCGID.Focus()
             End If
-        Else
-            MessageBox.Show("The CGID Number is invalid!.", "Invalid!")
-            txtCGID.Focus()
-        End If
+        Catch ex As Exception
+            MsgBox(ex.Message, vbCritical)
+        End Try
     End Sub
 
     Private Sub txtCGID_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtCGID.KeyPress

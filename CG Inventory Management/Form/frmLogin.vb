@@ -39,7 +39,7 @@
     End Sub
 
     Private Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
-        If txtID.Text = "a" And txtPass.Text = "a" Then
+        If txtID.Text = "@" And txtPass.Text = "@" Then
             frmMain.lblLvl.Text = 3
             Splash.Show()
             Me.Hide()

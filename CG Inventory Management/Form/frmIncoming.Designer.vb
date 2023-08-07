@@ -225,6 +225,7 @@ Partial Class frmIncoming
         Me.txtPrintQ.Font = New System.Drawing.Font("Century Gothic", 24.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtPrintQ.Location = New System.Drawing.Point(815, 197)
         Me.txtPrintQ.Maximum = New Decimal(New Integer() {50, 0, 0, 0})
+        Me.txtPrintQ.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.txtPrintQ.Name = "txtPrintQ"
         Me.txtPrintQ.Size = New System.Drawing.Size(59, 47)
         Me.txtPrintQ.TabIndex = 4
