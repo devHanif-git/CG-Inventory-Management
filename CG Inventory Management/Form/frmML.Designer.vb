@@ -42,8 +42,8 @@ Partial Class frmML
         Me.lblTotalHis = New System.Windows.Forms.Label()
         Me.dgvLog = New System.Windows.Forms.DataGridView()
         Me.Guna2ContextMenuStrip1 = New Guna.UI2.WinForms.Guna2ContextMenuStrip()
-        Me.CalcToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CalculateTotalOfQuantityInToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CalcToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         CType(Me.dgvLog, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -334,14 +334,7 @@ Partial Class frmML
         Me.Guna2ContextMenuStrip1.RenderStyle.SelectionForeColor = System.Drawing.Color.White
         Me.Guna2ContextMenuStrip1.RenderStyle.SeparatorColor = System.Drawing.Color.Gainsboro
         Me.Guna2ContextMenuStrip1.RenderStyle.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault
-        Me.Guna2ContextMenuStrip1.Size = New System.Drawing.Size(238, 70)
-        '
-        'CalcToolStripMenuItem
-        '
-        Me.CalcToolStripMenuItem.Image = CType(resources.GetObject("CalcToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.CalcToolStripMenuItem.Name = "CalcToolStripMenuItem"
-        Me.CalcToolStripMenuItem.Size = New System.Drawing.Size(237, 22)
-        Me.CalcToolStripMenuItem.Text = "Calculate Total of Quantity Out"
+        Me.Guna2ContextMenuStrip1.Size = New System.Drawing.Size(238, 48)
         '
         'CalculateTotalOfQuantityInToolStripMenuItem
         '
@@ -349,6 +342,13 @@ Partial Class frmML
         Me.CalculateTotalOfQuantityInToolStripMenuItem.Name = "CalculateTotalOfQuantityInToolStripMenuItem"
         Me.CalculateTotalOfQuantityInToolStripMenuItem.Size = New System.Drawing.Size(237, 22)
         Me.CalculateTotalOfQuantityInToolStripMenuItem.Text = "Calculate Total of Quantity In"
+        '
+        'CalcToolStripMenuItem
+        '
+        Me.CalcToolStripMenuItem.Image = CType(resources.GetObject("CalcToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.CalcToolStripMenuItem.Name = "CalcToolStripMenuItem"
+        Me.CalcToolStripMenuItem.Size = New System.Drawing.Size(237, 22)
+        Me.CalcToolStripMenuItem.Text = "Calculate Total of Quantity Out"
         '
         'frmML
         '

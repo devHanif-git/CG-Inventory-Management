@@ -646,22 +646,22 @@ Public Class frmIncoming
         End If
 
         ' Check if the textbox has reached the maximum length of the pattern
-        If txtGRN.Text.Length >= 10 Then
+        If txtGRN.Text.Length >= 12 Then
             ' If the textbox has reached the maximum length and no text is selected, prevent any further input
             e.SuppressKeyPress = True
             Return
         End If
 
         ' Check if the third character is not a "/"
-        If value.Length = 2 AndAlso value(1) <> "/" Then
+        If value.Length = 3 AndAlso value(2) <> "/" Then
             ' If it is not a "/", add one after the third character
-            txtGRN.Text = value.Substring(0, 2) & "/" & value.Substring(2)
-            txtGRN.SelectionStart = 3
+            txtGRN.Text = value.Substring(0, 3) & "/" & value.Substring(3)
+            txtGRN.SelectionStart = 4
         End If
 
-        If value.Length = 5 AndAlso value(4) <> "/" Then
-            txtGRN.Text = value.Substring(0, 5) & "/" & value.Substring(5)
-            txtGRN.SelectionStart = 6
+        If value.Length = 7 AndAlso value(6) <> "/" Then
+            txtGRN.Text = value.Substring(0, 7) & "/" & value.Substring(7)
+            txtGRN.SelectionStart = 8
         End If
     End Sub
 
