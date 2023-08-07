@@ -73,6 +73,7 @@ Public Class frmStockIn
                     Exit Sub
                 End If
 
+                'To split the QR to CGID only
                 Dim str As String
                 Dim strArr() As String
                 Dim strCGID As String
@@ -83,6 +84,11 @@ Public Class frmStockIn
 
                 str = txtScan.Text.Trim
                 strArr = str.Split(";")
+
+                'Catch the wrong code or not QR
+                If strArr.Length < 5 Then
+                    Exit Sub
+                End If
 
                 For count = 0 To strArr.Length - 1
                     strC(count) = strArr(count)
@@ -103,7 +109,7 @@ Public Class frmStockIn
                     End If
                 End If
 
-
+                oldscan = txtScan.Text.Trim
 
                 SQL.AddParam("@printcode", oldscan)
                 SQL.ExecQuery("SELECT TOP 1 * FROM PartOut WHERE PrintCode = @printcode")
@@ -119,8 +125,6 @@ Public Class frmStockIn
                 SQL.ExecQuery("SELECT TOP 1 * FROM Inventory WHERE CGID = @cgid")
 
                 If SQL.RecordCount > 0 Then
-                    oldscan = txtScan.Text.Trim
-
 onrecord:
                     MessageBox.Show("This part is still on the rack!" & vbCrLf &
                                             "Please begin with a stockout.", "Part Need to Stockout!",
@@ -153,7 +157,6 @@ onrecord:
                 If SQL.HasException(True) Then Exit Sub
 
                 If SQL.RecordCount > 0 Then
-                    oldscan = txtScan.Text.Trim
                     txtScan.Text = ""
 
                     Dim strDate As DateTime
