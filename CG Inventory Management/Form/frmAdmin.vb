@@ -209,42 +209,36 @@
         End Try
     End Sub
     Private Sub DoUpdate()
-        Try
-            SQL.AddParam("@oldid", OldID)
-            SQL.AddParam("@id", txtID.Text)
-            SQL.AddParam("@pass", Encrypt(txtPass.Text))
-            SQL.AddParam("@name", txtName.Text)
-            SQL.AddParam("@email", txtEmail.Text)
-            SQL.AddParam("@group", txtUGroup.Text)
-            If txtULvl.SelectedIndex = 1 Then
-                SQL.AddParam("@lvl", 3)
-            ElseIf txtULvl.SelectedIndex = 2 Then
-                SQL.AddParam("@lvl", 2)
-            ElseIf txtULvl.SelectedIndex = 3 Then
-                SQL.AddParam("@lvl", 1)
-            End If
-            If cbxActive.Checked Then
-                SQL.AddParam("@stts", 1)
-            Else
-                SQL.AddParam("@stts", 0)
-            End If
+        SQL.AddParam("@oldid", OldID)
+        SQL.AddParam("@id", txtID.Text)
+        SQL.AddParam("@pass", Encrypt(txtPass.Text))
+        SQL.AddParam("@name", txtName.Text)
+        SQL.AddParam("@email", txtEmail.Text)
+        SQL.AddParam("@group", txtUGroup.Text)
+        If txtULvl.SelectedIndex = 1 Then
+            SQL.AddParam("@lvl", 3)
+        ElseIf txtULvl.SelectedIndex = 2 Then
+            SQL.AddParam("@lvl", 2)
+        ElseIf txtULvl.SelectedIndex = 3 Then
+            SQL.AddParam("@lvl", 1)
+        End If
+        If cbxActive.Checked Then
+            SQL.AddParam("@stts", 1)
+        Else
+            SQL.AddParam("@stts", 0)
+        End If
 
-            SQL.ExecQuery("UPDATE Users SET UserID = @id, UserPass = @pass, Name = @name, Email = @email, UserGroup = @group, UserLevel = @lvl, Status = @stts WHERE UserID = @oldid;")
-            If SQL.HasException(True) Then Exit Sub
+        SQL.ExecQuery("UPDATE Users SET UserID = @id, UserPass = @pass, Name = @name, Email = @email, UserGroup = @group, UserLevel = @lvl, Status = @stts WHERE UserID = @oldid;")
+        If SQL.HasException(True) Then Exit Sub
 
-            MessageBox.Show("Employee Details Has Been Updated.", "Administrator")
-        Catch ex As Exception
-            MsgBox(ex.Message, vbCritical)
-        End Try
+        MessageBox.Show("Employee Details Has Been Updated.", "Administrator")
     End Sub
 
     Private Sub DoDelete()
-        Try
-            SQL.AddParam("@id", txtID.Text)
-            SQL.ExecQuery("DELETE FROM Users WHERE UserID = @id")
-        Catch ex As Exception
-            MsgBox(ex.Message, vbCritical)
-        End Try
+
+        SQL.AddParam("@id", txtID.Text)
+        SQL.ExecQuery("DELETE FROM Users WHERE UserID = @id")
+        If SQL.HasException(True) Then Exit Sub
     End Sub
 
     Private Sub AddEmployeeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddEmployeeToolStripMenuItem.Click
