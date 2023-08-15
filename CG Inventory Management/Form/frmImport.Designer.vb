@@ -74,9 +74,9 @@ Partial Class frmImport
         Me.btnExit.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnExit.BackColor = System.Drawing.Color.Transparent
         Me.btnExit.Image = CType(resources.GetObject("btnExit.Image"), System.Drawing.Image)
-        Me.btnExit.Location = New System.Drawing.Point(1129, 20)
+        Me.btnExit.Location = New System.Drawing.Point(1129, 0)
         Me.btnExit.Name = "btnExit"
-        Me.btnExit.Size = New System.Drawing.Size(31, 36)
+        Me.btnExit.Size = New System.Drawing.Size(43, 56)
         Me.btnExit.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.btnExit.TabIndex = 10
         Me.btnExit.TabStop = False

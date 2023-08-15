@@ -70,9 +70,9 @@ Partial Class frmMain
         Me.btnExit.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnExit.BackColor = System.Drawing.Color.Transparent
         Me.btnExit.Image = CType(resources.GetObject("btnExit.Image"), System.Drawing.Image)
-        Me.btnExit.Location = New System.Drawing.Point(1247, 8)
+        Me.btnExit.Location = New System.Drawing.Point(1247, 0)
         Me.btnExit.Name = "btnExit"
-        Me.btnExit.Size = New System.Drawing.Size(27, 27)
+        Me.btnExit.Size = New System.Drawing.Size(37, 35)
         Me.btnExit.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.btnExit.TabIndex = 7
         Me.btnExit.TabStop = False
@@ -94,9 +94,9 @@ Partial Class frmMain
         Me.btnMinimize.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnMinimize.BackColor = System.Drawing.Color.Transparent
         Me.btnMinimize.Image = CType(resources.GetObject("btnMinimize.Image"), System.Drawing.Image)
-        Me.btnMinimize.Location = New System.Drawing.Point(1214, 8)
+        Me.btnMinimize.Location = New System.Drawing.Point(1214, 0)
         Me.btnMinimize.Name = "btnMinimize"
-        Me.btnMinimize.Size = New System.Drawing.Size(27, 27)
+        Me.btnMinimize.Size = New System.Drawing.Size(36, 35)
         Me.btnMinimize.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.btnMinimize.TabIndex = 9
         Me.btnMinimize.TabStop = False
