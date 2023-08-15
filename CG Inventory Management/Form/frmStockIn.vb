@@ -87,6 +87,7 @@ Public Class frmStockIn
 
                 'Catch the wrong code or not QR
                 If strArr.Length < 5 Then
+                    txtScan.SelectAll()
                     Exit Sub
                 End If
 
